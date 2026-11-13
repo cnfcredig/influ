@@ -1612,7 +1612,6 @@ function renderForm(host, opts){
       if(j.bairro) F.neighborhood.value = j.bairro;
       if(j.localidade) F.city.value = j.localidade;
       if(j.uf) F.uf.value = j.uf;
-      if(j.complemento && !F.complement.value) F.complement.value = j.complemento;
       [F.address,F.neighborhood,F.city,F.uf].forEach(el=>clearErr(el.closest(".field")));
       cepStatus.textContent = "Endereço preenchido. Falta o número.";
       F.address_number.focus();
