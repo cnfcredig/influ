@@ -1532,16 +1532,6 @@ function renderForm(host, opts){
   F.crea_number = h("input",{class:"input", type:"text", value:data.crea_number||"", placeholder:"Só números", inputmode:"numeric", autocomplete:"off", enterkeyhint:"next"});
   F.crea_number.addEventListener("input", ()=>{ F.crea_number.value = onlyDigits(F.crea_number.value).slice(0,12); });
   const regWrap = field(g2, "crea_number", "Nº de registro no Crea", F.crea_number, {w:"c-4", mid:5});
-  F.no_registry = h("input",{type:"checkbox", id:px+"_noreg"});
-  F.no_registry.checked = !!data.no_registry;
-  regWrap.append(h("label",{class:"check", for:px+"_noreg"}, F.no_registry, h("span",{text:"Ainda não tenho registro"})));
-  function syncReg(){
-    const off = F.no_registry.checked;
-    F.crea_number.disabled = off;
-    if(off){ F.crea_number.value = ""; clearErr(regWrap); }
-    F.crea_number.placeholder = off ? "Sem registro" : "Só números";
-  }
-  F.no_registry.addEventListener("change", syncReg); syncReg();
   const igWrap = h("div",{class:"field c-12"});
   const btnAddIg = h("button",{class:"btn ghost sm ig-add", type:"button", text:"+ Outro perfil"});
   igWrap.append(h("div",{class:"ig-head"}, h("label",{for:px+"_ig0"}, "Perfis de Instagram", h("span",{class:"opt", text:"  (pessoal, comercial...)"})), btnAddIg));
@@ -1659,10 +1649,9 @@ function renderForm(host, opts){
     {s:2, el:mp.input, wrap:modWrap, ok:()=> !!mp.code() || !needForm, msg:"Escolha a modalidade da sua formação (ou Outros)."},
     {s:2, el:mp.other, wrap:modWrap, ok:()=> mp.code()!=="OUTROS" || mp.otherText().length>=2, msg:"Escreva qual é a sua formação."},
     {s:2, el:F.crea_number, wrap:regWrap, ok:()=>{
-      if(F.no_registry.checked) return true;
       const n = onlyDigits(F.crea_number.value).length;
       return (n>=4 && n<=12) || (!needForm && n===0);
-    }, msg:"Informe o número de registro no Crea (só números) ou marque “Ainda não tenho registro”."},
+    }, msg:"Informe o número de registro no Crea (só números)."},
     {s:2, el:()=>igRows.querySelector("input"), wrap:igWrap, ok:()=>collectIg().length>0, msg:"Informe pelo menos um @ do Instagram."},
     {s:3, el:F.cep, ok:()=>onlyDigits(F.cep.value).length===8, msg:"O CEP tem 8 dígitos."},
     {s:3, el:F.address, ok:()=>F.address.value.trim(), msg:"Informe o logradouro."},
@@ -1778,8 +1767,8 @@ function renderForm(host, opts){
       neighborhood: F.neighborhood.value.trim(),
       address_number: F.address_number.value.trim(),
       complement: F.complement.value.trim() || null,
-      crea_number: F.no_registry.checked ? null : (onlyDigits(F.crea_number.value) || null),
-      no_registry: F.no_registry.checked ? true : null,
+      crea_number: onlyDigits(F.crea_number.value) || null,
+      no_registry: null,
       modality_code: mp.code() || null,
       modality_other: mp.code()==="OUTROS" ? (mp.otherText() || null) : null
     };
