@@ -168,7 +168,7 @@
   @media(max-width:560px){ .card{padding:18px} }
 
   /* ===== Layout público ===== */
-  .public-wrap{max-width:1120px; margin:0 auto;
+  .public-wrap{max-width:1120px; width:100%; margin:0 auto;
     padding:26px max(16px, env(safe-area-inset-right, 0px)) 36px max(16px, env(safe-area-inset-left, 0px))}
   .hero-evt{display:none}
   .form-head{display:flex; align-items:flex-end; gap:6px 12px; flex-wrap:wrap; margin-bottom:12px}
@@ -179,8 +179,37 @@
   html[data-skin="encontro"] .public-wrap{
     max-width:1400px; display:grid; grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);
     gap:clamp(20px,3.5vw,56px); align-items:center;
-    min-height:calc(100dvh - var(--topbar-h) - env(safe-area-inset-top, 0px));
+    flex:1 0 auto; width:100%;
     padding-top:clamp(12px,2.2vh,28px); padding-bottom:clamp(12px,2.2vh,28px);
+  }
+  /* A tela de inscrição ocupa exatamente a altura da janela: topo + conteúdo, sem sobra */
+  body.view-public main{display:flex; flex-direction:column}
+  body.view-public #view-public{flex:1 0 auto; display:flex; flex-direction:column}
+
+  /* Encaixe automático: só entra quando falta altura, em níveis, sem mudar o visual */
+  body.view-public.fit-1 .form-head p{display:none}
+  body.view-public.fit-1 .form-card .help.is-default{display:none}
+  html:not([data-skin="encontro"]) body.view-public.fit-1 .footer{display:none}
+  body.view-public.fit-2 .form-root .input, body.view-public.fit-2 .form-root select{min-height:40px; padding-top:7px; padding-bottom:7px}
+  body.view-public.fit-2 .form-root .form-grid{gap:8px 10px}
+  body.view-public.fit-2 .form-root .field{gap:3px}
+  body.view-public.fit-2 .form-root .steps{margin-bottom:8px}
+  body.view-public.fit-2 .form-root .btn-row{margin-top:10px}
+  body.view-public.fit-2 .form-card{padding:14px 16px}
+  body.view-public.fit-2 .public-wrap{padding-top:8px; padding-bottom:8px}
+  @media(max-width:899px){
+    html[data-skin="encontro"] body.view-public.fit-1 .form-logos{display:none}
+    html[data-skin="encontro"] body.view-public.fit-1 .evt-place{display:none}
+    html[data-skin="encontro"] body.view-public.fit-2 .evt-open{display:none}
+    html[data-skin="encontro"] body.view-public.fit-2 .lockup{--t:min(6.6cqi, 40px)}
+    html[data-skin="encontro"] body.view-public.fit-3 .lockup{--t:min(5.2cqi, 30px)}
+    html[data-skin="encontro"] body.view-public.fit-3 .evt-date{font-size:clamp(1.1rem,6cqi,2rem)}
+    html[data-skin="encontro"] body.view-public.fit-3 .public-wrap{gap:8px}
+    html[data-skin="encontro"] body.view-public.fit-3 .form-head{margin-bottom:6px}
+    html[data-skin="encontro"] body.view-public.fit-3 .form-head h2{font-size:1.2rem}
+    body.view-public.fit-3 .form-root label{font-size:.78rem}
+    body.view-public.fit-3 .form-root .input, body.view-public.fit-3 .form-root select{min-height:38px; padding-top:6px; padding-bottom:6px}
+    body.view-public.fit-3 .topbar-in{min-height:50px; padding-top:5px; padding-bottom:5px}
   }
   html[data-skin="encontro"] .hero-evt{display:flex}
   html[data-skin="encontro"] .form-head h2{font-family:var(--slab); font-weight:400; font-size:clamp(1.35rem,2.4vw,1.75rem); letter-spacing:.01em;
@@ -535,8 +564,31 @@
     #infToolbar{grid-template-columns:repeat(2,minmax(0,1fr)); grid-template-areas:"search search" "uf cat" "sort reload" "new new"}
   }
 
+  /* Reinscrição: linha derivada da principal, com o que mudou marcado */
+  .resub-badge{align-self:flex-start; display:inline-flex; align-items:center; gap:4px; font-size:.68rem; font-weight:800; line-height:1.2;
+    padding:2px 8px; border-radius:999px; background:var(--gold-soft); color:var(--gold-strong); border:1px solid var(--gold-soft)}
+  #infTable tbody tr.is-deriv{background:var(--surface-2)}
+  #infTable tbody tr.is-deriv td.c-person{padding-left:34px; position:relative}
+  #infTable tbody tr.is-deriv td.c-person::before{content:""; position:absolute; left:16px; top:0; bottom:50%; width:12px;
+    border-left:2px solid var(--border-strong); border-bottom:2px solid var(--border-strong); border-bottom-left-radius:8px}
+  @media(min-width:861px){ #infTable tbody tr.has-deriv td, #infTable tbody tr.is-deriv:not(.group-end) td{border-bottom-style:dashed} }
+  .chg-list{display:flex; flex-wrap:wrap; gap:4px; align-items:center; font-size:.7rem; color:var(--muted)}
+  .chg-list .chg-tag{font-weight:800; padding:1px 7px; border-radius:6px; background:var(--gold-soft); color:var(--gold-strong)}
+  .chg{align-self:flex-start; max-width:100%; background:var(--gold-soft); color:var(--gold-strong) !important; border-radius:4px; padding:0 4px; margin-left:-4px; font-weight:700;
+    box-decoration-break:clone; -webkit-box-decoration-break:clone}
+  .ig-line.chg{margin-left:0; padding:1px 4px}
+  html[data-skin="encontro"] .resub-badge, html[data-skin="encontro"] .chg-list .chg-tag{background:var(--yellow); color:var(--navy); border-color:var(--navy)}
+  html[data-skin="encontro"] .chg{background:var(--yellow); color:var(--navy) !important}
+  .stat .l small{display:block; font-weight:600; opacity:.8; margin-top:2px}
+
   /* Celular e tablet: cada influenciador vira um cartão */
   @media(max-width:860px){
+    #infTable tbody tr.has-deriv, #infTable tbody tr.is-deriv{margin-bottom:6px}
+    #infTable tbody tr.is-deriv{margin-left:18px; border-left:4px solid var(--border-strong)}
+    html[data-skin="encontro"] #infTable tbody tr.is-deriv{border-left-width:6px}
+    #infTable tbody tr.group-end{margin-bottom:14px}
+    #infTable tbody tr.is-deriv td.c-person{padding-left:0}
+    #infTable tbody tr.is-deriv td.c-person::before{display:none}
     .table-wrap{border:none; background:transparent; box-shadow:none}
     html[data-skin="encontro"] .table-wrap{border:none}
     #infTable thead, #infTable colgroup{display:none}
@@ -822,9 +874,9 @@
       <!-- PAINEL -->
       <div id="panel-painel">
         <div class="stats">
-          <div class="stat"><div class="n" id="statTotal">0</div><div class="l">Cadastros no total</div></div>
-          <div class="stat"><div class="n" id="statMonth">0</div><div class="l">Cadastros neste mês</div></div>
-          <div class="stat"><div class="n" id="statToday">0</div><div class="l">Cadastros hoje</div></div>
+          <div class="stat"><div class="n" id="statTotal">0</div><div class="l">Influenciadores no total<small id="statResub"></small></div></div>
+          <div class="stat"><div class="n" id="statMonth">0</div><div class="l">Novos neste mês</div></div>
+          <div class="stat"><div class="n" id="statToday">0</div><div class="l">Novos hoje</div></div>
         </div>
 
         <div class="card">
@@ -1040,6 +1092,7 @@ function applySkin(id){
   const meta = document.querySelector('meta[name="theme-color"]'); if(meta) meta.setAttribute("content", s.color);
   syncSkinTexts();
   if(!byId("view-admin").hidden && admin.all) { renderChart(); }
+  scheduleFit();
 }
 function syncSkinTexts(){
   const evt = isEvt();
@@ -1130,12 +1183,22 @@ function confirmSkin(id){
 
 /* ============================================================
    FORMULÁRIO (cadastro público, cadastro e edição pelo admin)
-   Em telas pequenas ou baixas, vira 3 passos curtos (sem rolagem).
+   No celular e em telas pequenas, vira 3 passos curtos; no computador fica inteiro.
    ============================================================ */
 /* Passo a passo só quando o formulário inteiro não cabe na altura visível da tela */
 let publicWizardApply = null, fitT = null;
+let lastFitW = 0;
+function isSmallScreen(){
+  // celular em pé (até 760 px de largura) ou celular deitado (tela de toque baixa)
+  return window.matchMedia("(max-width: 760px), (pointer: coarse) and (max-height: 520px)").matches;
+}
 function scheduleFit(){ clearTimeout(fitT); fitT = setTimeout(()=>{ if(publicWizardApply) publicWizardApply(); }, 120); }
-window.addEventListener("resize", scheduleFit);
+window.addEventListener("resize", ()=>{
+  // teclado do celular abrindo/fechando muda só a altura: não reencaixar enquanto alguém digita
+  const a = document.activeElement;
+  if(window.innerWidth === lastFitW && a && /^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName)) return;
+  scheduleFit();
+});
 window.addEventListener("orientationchange", scheduleFit);
 if(document.fonts && document.fonts.ready) document.fonts.ready.then(scheduleFit);
 
@@ -1362,17 +1425,30 @@ function renderForm(host, opts){
   function fitCheck(){
     if(!opts.wizard || !root.isConnected) return;
     if(document.body.classList.contains("filling") && wizOn) { paint(false); return; }
-    const prev = wizOn;
+    if(byId("view-public").hidden) return;
+    lastFitW = window.innerWidth;
+    const prev = wizOn, keep = cur, body = document.body;
+    const over = ()=> document.documentElement.scrollHeight - window.innerHeight;
+    // sobra no pior caso: no passo a passo, mede cada etapa e fica com a mais alta
+    const worst = ()=>{
+      if(!wizOn) return over();
+      let m = -Infinity;
+      for(let s = 1; s <= 3; s++){ cur = s; paint(false); m = Math.max(m, over()); }
+      cur = keep; return m;
+    };
     root.classList.add("measuring");
+    body.classList.remove("fit-1","fit-2","fit-3");
     wizOn = false; paint(false);
-    const card = byId("formCard");
-    let top = 0; for(let el = card; el; el = el.offsetParent) top += el.offsetTop;
-    const need = top + card.offsetHeight + 12;
-    wizOn = need > window.innerHeight;
-    root.dataset.fit = need + "/" + window.innerHeight;
-    paint(false);
-    requestAnimationFrame(()=> root.classList.remove("measuring"));
+    let o = over();
+    // Passo a passo só em celular e telas pequenas; no computador o formulário fica inteiro
+    // (se não couber na altura, compacta e, no limite, a página rola).
+    if(o > 0 && isSmallScreen()){ wizOn = true; o = worst(); }
+    let lvl = 0;
+    while(o > 0 && lvl < 3){ lvl++; body.classList.add("fit-"+lvl); o = worst(); }
     if(prev !== wizOn && !wizOn) cur = 1;
+    paint(false);
+    root.dataset.fit = "nivel " + lvl + " / sobra " + Math.max(0, o);
+    requestAnimationFrame(()=> root.classList.remove("measuring"));
   }
   function goTo(n, checkBefore){
     if(!isWizard()) return;
@@ -1543,7 +1619,7 @@ function confirmBox(title, text, okLabel, onOk){
 /* ============================================================
    ÁREA ADMIN
    ============================================================ */
-const admin = { all:[], logs:[], categories:[], sortKey:"created_at", sortDir:"desc", chartMode:"day" };
+const admin = { all:[], roots:[], kids:new Map(), diff:new Map(), logs:[], categories:[], sortKey:"created_at", sortDir:"desc", chartMode:"day" };
 
 byId("btnLogin").addEventListener("click", doLogin);
 byId("admPass").addEventListener("keydown", e=>{ if(e.key==="Enter") doLogin(); });
@@ -1595,8 +1671,8 @@ async function doLogin(){
   showAdminApp();
 }
 
-function showAdminLogin(){ byId("adminLogin").hidden=false; byId("adminApp").hidden=true; }
-function showAdminApp(){ byId("adminLogin").hidden=true; byId("adminApp").hidden=false; populateUfFilter(); loadCategories(); loadAll(); }
+function showAdminLogin(){ stopRealtime(); byId("adminLogin").hidden=false; byId("adminApp").hidden=true; }
+function showAdminApp(){ byId("adminLogin").hidden=true; byId("adminApp").hidden=false; populateUfFilter(); loadCategories(); loadAll(); startRealtime(); }
 
 function populateUfFilter(){
   const sel = byId("ufFilter");
@@ -1604,12 +1680,67 @@ function populateUfFilter(){
   UFS.forEach(u => sel.append(h("option",{value:u, text:u})));
 }
 
+/* Carrega tudo e agrupa as reinscrições sob o cadastro principal (o primeiro da pessoa).
+   Respostas atrasadas de uma carga anterior são descartadas, para a tela nunca voltar a um estado velho. */
+let loadSeq = 0;
 async function loadAll(){
+  const my = ++loadSeq;
   const { data, error } = await sb.from("influencers").select("*").order("created_at",{ascending:false});
+  if(my !== loadSeq) return;
   if(error){ toast(error.message,"err"); return; }
   admin.all = data || [];
+  buildGroups();
   renderStats(); renderChart(); renderTable();
+  if(!byId("panel-categorias").hidden) renderCatList();
 }
+function buildGroups(){
+  const byId_ = new Map(admin.all.map(r=>[r.id, r]));
+  const kids = new Map();
+  admin.roots = [];
+  for(const r of admin.all){
+    if(r.parent_id && byId_.has(r.parent_id)){
+      if(!kids.has(r.parent_id)) kids.set(r.parent_id, []);
+      kids.get(r.parent_id).push(r);
+    } else admin.roots.push(r);
+  }
+  admin.kids = kids;
+  // cada derivação comparada com a inscrição imediatamente anterior da mesma pessoa
+  admin.diff = new Map();
+  for(const root of admin.roots){
+    const list = (kids.get(root.id)||[]).sort((a,b)=> new Date(a.created_at) - new Date(b.created_at));
+    let prev = root;
+    list.forEach((k,i)=>{ k._n = i+2; admin.diff.set(k.id, diffRows(prev, k)); prev = k; });
+  }
+}
+const DIFF_FIELDS = [
+  ["full_name","Nome"],["email","E-mail"],["phone","Celular"],["instagrams","Instagram"],["cep","CEP"],
+  ["address","Logradouro"],["address_number","Número"],["complement","Complemento"],["neighborhood","Bairro"],["city","Cidade"],["uf","Estado"]
+];
+function igKey(list){ return (list||[]).map(i=>(i.handle||"")+"|"+(i.label||"")).sort().join(","); }
+function diffRows(a, b){
+  const out = new Set();
+  for(const [k] of DIFF_FIELDS){
+    if(k==="instagrams"){ if(igKey(a.instagrams)!==igKey(b.instagrams)) out.add(k); continue; }
+    const va = (a[k]==null?"":String(a[k])).trim().toLowerCase(), vb = (b[k]==null?"":String(b[k])).trim().toLowerCase();
+    if(va!==vb) out.add(k);
+  }
+  return out;
+}
+
+/* Painel sempre atualizado: tempo real (só administradores recebem) + recarga ao voltar para a aba */
+let rtChannel = null, rtT = null;
+function startRealtime(){
+  if(rtChannel) return;
+  rtChannel = sb.channel("influencers-admin")
+    .on("postgres_changes", { event:"*", schema:"public", table:"influencers" }, ()=>{
+      clearTimeout(rtT); rtT = setTimeout(()=>{ loadAll(); if(admin.logs.length) loadLogs(); }, 400);
+    })
+    .subscribe();
+}
+function stopRealtime(){ if(rtChannel){ sb.removeChannel(rtChannel); rtChannel = null; } }
+document.addEventListener("visibilitychange", ()=>{
+  if(document.visibilityState==="visible" && !byId("adminApp").hidden) loadAll();
+});
 
 /* ---- Categorias ---- */
 async function loadCategories(){
@@ -1621,7 +1752,7 @@ async function loadCategories(){
   if(admin.all.length) renderTable();
 }
 function catName(id){ const c = admin.categories.find(x=>x.id===id); return c ? c.name : ""; }
-function catCount(id){ return admin.all.filter(r=>r.category_id===id).length; }
+function catCount(id){ return (admin.roots||[]).filter(r=>r.category_id===id).length; }
 function populateCatFilter(){
   const sel = byId("catFilter"); const cur = sel.value;
   clear(sel);
@@ -1693,8 +1824,11 @@ async function loadLogs(){
 }
 
 function renderStats(){
-  const all = admin.all;
+  // contagem por pessoa: reinscrições não somam influenciador novo
+  const all = admin.roots || [];
   byId("statTotal").textContent = all.length;
+  const resub = admin.all.length - all.length;
+  byId("statResub").textContent = resub > 0 ? ("+ " + resub + (resub===1 ? " reinscrição" : " reinscrições")) : "";
   const now = new Date();
   const ymNow = now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0");
   const dNow = ymNow+"-"+String(now.getDate()).padStart(2,"0");
@@ -1720,7 +1854,7 @@ function renderChart(){
   if(byId("adminApp").hidden || byId("panel-painel").hidden) return;
   const mode = admin.chartMode;
   const map = new Map();
-  for(const r of admin.all){
+  for(const r of (admin.roots||[])){
     const d = new Date(r.created_at);
     let key, label;
     if(mode==="month"){
@@ -1787,15 +1921,20 @@ function getFiltered(){
   const term = byId("searchInput").value.trim().toLowerCase().replace(/^@/,"");
   const uf = byId("ufFilter").value;
   const cat = byId("catFilter").value;
-  let rows = admin.all.filter(r=>{
+  const match = r=>{
     if(uf && r.uf!==uf) return false;
-    if(cat){ if(cat==="__none__"){ if(r.category_id) return false; } else if(r.category_id!==cat) return false; }
     if(!term) return true;
     const igs = (r.instagrams||[]).map(i=>i.handle).join(" ");
     return (r.full_name||"").toLowerCase().includes(term)
         || (r.email||"").toLowerCase().includes(term)
         || (r.city||"").toLowerCase().includes(term)
+        || onlyDigits(r.phone).includes(onlyDigits(term) || "\u0000")
         || igs.toLowerCase().includes(term);
+  };
+  // a pessoa aparece se o cadastro principal ou qualquer reinscrição dela bater com o filtro
+  let rows = (admin.roots||[]).filter(r=>{
+    if(cat){ if(cat==="__none__"){ if(r.category_id) return false; } else if(r.category_id!==cat) return false; }
+    return match(r) || (admin.kids.get(r.id)||[]).some(match);
   });
   const k = admin.sortKey, dir = admin.sortDir==="asc"?1:-1;
   rows.sort((a,b)=>{
@@ -1878,29 +2017,56 @@ function renderTable(){
   thead.append(trh);
 
   const rows = getFiltered();
-  byId("tableCount").textContent = rows.length+" perfil(is) listado(s) de "+admin.all.length+" no total.";
+  const totalPeople = (admin.roots||[]).length, resub = admin.all.length - totalPeople;
+  byId("tableCount").textContent = rows.length+" influenciador(es) listado(s) de "+totalPeople+" no total"
+    + (resub>0 ? " ("+admin.all.length+" inscrições, "+resub+" delas repetidas)." : ".");
   if(rows.length===0){ tbody.append(h("tr",{}, h("td",{class:"c-empty", colspan:COLUMNS.length}, h("div",{class:"center-empty", text:"Nenhum perfil encontrado."})))); return; }
 
-  rows.forEach(row=>{
-    const firstIg = (row.instagrams && row.instagrams[0]) ? row.instagrams[0].handle : null;
-    const cat = row.category_id ? catName(row.category_id) : "";
-    const dt = fmtDateTime(row.created_at).split(" ");
-    tbody.append(h("tr",{},
-      h("td",{class:"c-person"},
-        h("div",{class:"person"}, avatarEl(firstIg, row.full_name),
-          h("div",{class:"person-txt"}, h("strong",{text:row.full_name}),
-            h("span",{class:"cat-chip"+(cat?"":" none"), text: cat || "Sem categoria"})))),
-      h("td",{class:"c-contact", "data-label":"Contato"},
-        h("div",{class:"stack"}, h("span",{class:"main"}, soft(row.email||"-")), h("span",{class:"sub", text:row.phone||"-"}),
-          igLinks(row.instagrams, "ig-in-contact"))),
-      h("td",{class:"c-ig", "data-label":"Instagram"}, igLinks(row.instagrams)),
-      h("td",{class:"c-local", "data-label":"Local"},
-        h("div",{class:"stack"}, h("span",{class:"main", text:row.city||"-"}), h("span",{class:"sub", text:row.uf||""}))),
-      h("td",{class:"c-date", "data-label":"Cadastro"},
-        h("div",{class:"stack"}, h("span",{class:"main", text:dt[0]||"-"}), h("span",{class:"sub", text:dt[1]||""}))),
-      h("td",{class:"c-actions"}, rowActions(row))
-    ));
+  const frag = document.createDocumentFragment();
+  rows.forEach(root=>{
+    const kids = (admin.kids.get(root.id)||[]).slice().sort((a,b)=> new Date(a.created_at) - new Date(b.created_at));
+    frag.append(infRow(root, { total: kids.length+1, last: kids.length===0 }));
+    kids.forEach((k,i)=> frag.append(infRow(k, { deriv:true, n:k._n, chg: admin.diff.get(k.id) || new Set(), last: i===kids.length-1 })));
   });
+  tbody.append(frag);
+}
+
+function infRow(row, o){
+  const chg = o.chg || new Set();
+  const mark = (k, node)=>{ if(chg.has(k)) node.classList.add("chg"); return node; };
+  const firstIg = (row.instagrams && row.instagrams[0]) ? row.instagrams[0].handle : null;
+  const catId = o.deriv ? (admin.all.find(r=>r.id===row.parent_id)||row).category_id : row.category_id;
+  const cat = catId ? catName(catId) : "";
+  const dt = fmtDateTime(row.created_at).split(" ");
+  const txt = h("div",{class:"person-txt"}, mark("full_name", h("strong",{text:row.full_name})));
+  if(o.deriv){
+    txt.append(h("span",{class:"resub-badge", text: o.n+"ª inscrição"}));
+    const labels = DIFF_FIELDS.filter(([k])=>chg.has(k)).map(([,l])=>l);
+    const list = h("div",{class:"chg-list"});
+    if(labels.length){ list.append(h("span",{text:"Mudou:"})); labels.forEach(l=> list.append(h("span",{class:"chg-tag", text:l}))); }
+    else list.append(h("span",{text:"Mesmos dados da inscrição anterior"}));
+    txt.append(list);
+  } else {
+    txt.append(h("span",{class:"cat-chip"+(cat?"":" none"), text: cat || "Sem categoria"}));
+    if(o.total>1) txt.append(h("span",{class:"resub-badge", text: o.total+" inscrições"}));
+  }
+  const igA = igLinks(row.instagrams, "ig-in-contact"), igB = igLinks(row.instagrams);
+  if(chg.has("instagrams")){ igA.classList.add("chg"); igB.classList.add("chg"); }
+  const addrChanged = ["cep","address","address_number","complement","neighborhood"].filter(k=>chg.has(k));
+  const local = h("div",{class:"stack"}, mark("city", h("span",{class:"main", text:row.city||"-"})), mark("uf", h("span",{class:"sub", text:row.uf||""})));
+  if(addrChanged.length) local.append(h("span",{class:"sub chg", text:"endereço novo", title:[row.address, row.address_number, row.complement, row.neighborhood, row.cep].filter(Boolean).join(", ")}));
+  const cls = (o.deriv ? "is-deriv" : (o.total>1 ? "has-deriv" : "")) + (o.last ? " group-end" : "");
+  return h("tr",{class:cls.trim()},
+    h("td",{class:"c-person"},
+      h("div",{class:"person"}, avatarEl(firstIg, row.full_name), txt)),
+    h("td",{class:"c-contact", "data-label":"Contato"},
+      h("div",{class:"stack"}, mark("email", h("span",{class:"main"}, soft(row.email||"-"))), mark("phone", h("span",{class:"sub", text:row.phone||"-"})), igA)),
+    h("td",{class:"c-ig", "data-label":"Instagram"}, igB),
+    h("td",{class:"c-local", "data-label":"Local"}, local),
+    h("td",{class:"c-date", "data-label": o.deriv ? "Reinscrição" : "Cadastro"},
+      h("div",{class:"stack"}, h("span",{class:"main", text:dt[0]||"-"}), h("span",{class:"sub", text:dt[1]||""}))),
+    h("td",{class:"c-actions"}, rowActions(row))
+  );
 }
 
 /* ---- Ações admin ---- */
@@ -1925,7 +2091,10 @@ function openEditModal(row){
 }
 
 function deleteInfluencer(row){
-  confirmBox("Excluir cadastro?", 'Excluir definitivamente o cadastro de "'+row.full_name+'"? Não dá para desfazer.', "Excluir", async ()=>{
+  const kids = row.parent_id ? [] : ((admin.kids && admin.kids.get(row.id)) || []);
+  const what = row.parent_id ? "esta reinscrição de" : "o cadastro de";
+  const extra = kids.length ? " A inscrição seguinte da mesma pessoa passa a ser a principal." : "";
+  confirmBox("Excluir cadastro?", 'Excluir '+what+' "'+row.full_name+'"? Ele sai do painel, mas uma cópia fica guardada no arquivo de excluídos.'+extra, "Excluir", async ()=>{
     const { error } = await sb.from("influencers").delete().eq("id", row.id);
     if(error){ toast(error.message,"err"); closeModal(); return; }
     closeModal(); await loadAll(); toast("Cadastro excluído.","ok");
@@ -1964,7 +2133,7 @@ function renderLogs(){
   let logs = admin.logs;
   if(term) logs = logs.filter(l => (l.description||"").toLowerCase().includes(term) || (l.influencer_name||"").toLowerCase().includes(term));
   if(logs.length===0){ host.append(h("div",{class:"center-empty", text:"Nenhum registro no histórico."})); return; }
-  const LB = { create:["create","criação"], update:["update","alteração"], delete:["delete","exclusão"], key_reset:["key_reset","chave"], rename:["rename","renomear"], theme:["theme","aparência"] };
+  const LB = { create:["create","criação"], resubmit:["update","reinscrição"], update:["update","alteração"], delete:["delete","exclusão"], key_reset:["key_reset","chave"], rename:["rename","renomear"], theme:["theme","aparência"] };
   logs.forEach(l=>{
     const m = LB[l.action] || ["update", l.action||""];
     host.append(h("div",{class:"log-item"},
@@ -1990,6 +2159,7 @@ async function route(){
   byId("nav-public").classList.toggle("is-active", !isAdmin);
   byId("nav-admin").classList.toggle("is-active", isAdmin);
   if(!isAdmin && skinState.preview) endPreview();
+  if(!isAdmin) scheduleFit();
   if(isAdmin){
     const { data:{ session } } = await sb.auth.getSession();
     if(session){
@@ -2011,6 +2181,7 @@ document.addEventListener("visibilitychange", ()=>{ if(document.visibilityState=
   renderPublicForm();
   loadOfficialSkin();
   route();
+  setTimeout(scheduleFit, 1800); // de novo depois das animações de entrada
 })();
 </script>
 </body>
