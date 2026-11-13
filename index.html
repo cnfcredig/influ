@@ -318,7 +318,7 @@
   /* ===== Formulário ===== */
   .form-grid{display:grid; grid-template-columns:repeat(12,minmax(0,1fr)); gap:10px 12px}
   .field{display:flex; flex-direction:column; gap:5px; min-width:0}
-  .c-2{grid-column:span 2} .c-3{grid-column:span 3} .c-4{grid-column:span 4} .c-5{grid-column:span 5} .c-6{grid-column:span 6} .c-7{grid-column:span 7} .c-12{grid-column:1 / -1}
+  .c-2{grid-column:span 2} .c-3{grid-column:span 3} .c-4{grid-column:span 4} .c-5{grid-column:span 5} .c-6{grid-column:span 6} .c-7{grid-column:span 7} .c-8{grid-column:span 8} .c-12{grid-column:1 / -1}
   label{font-size:.84rem; font-weight:600; color:var(--label)}
   html[data-skin="encontro"] label{font-weight:800}
   label .opt{font-weight:500; color:var(--muted-2)}
@@ -386,6 +386,36 @@
     .btn-row .cta{flex:1; white-space:normal; line-height:1.15; font-size:.9rem; padding:10px 12px}
     .btn-row .btn.danger{flex:none}
   }
+
+  /* ===== Formação: modalidade com busca e registro no Crea ===== */
+  .mp{position:relative}
+  .mp-box{position:relative}
+  .mp-box .input{padding-right:42px}
+  .mp-toggle{position:absolute; right:5px; top:50%; transform:translateY(-50%); width:34px; height:34px; border:0; padding:0;
+    background:transparent; color:var(--muted); cursor:pointer; border-radius:var(--radius-xs); display:grid; place-items:center}
+  .mp-toggle svg{width:16px; height:16px; transition:transform .15s ease}
+  .mp.open .mp-toggle svg{transform:rotate(180deg)}
+  .mp-list{position:absolute; z-index:40; left:0; right:0; top:calc(100% + 6px); margin:0; padding:6px; list-style:none;
+    background:var(--surface); border:1.5px solid var(--border-strong); border-radius:var(--radius-sm); box-shadow:var(--shadow-lg);
+    max-height:min(320px, 46vh); overflow:auto; overscroll-behavior:contain}
+  .mp-group{padding:10px 10px 4px; font-size:.68rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--muted)}
+  .mp-opt{padding:8px 10px; border-radius:var(--radius-xs); cursor:pointer; display:flex; flex-direction:column; gap:1px}
+  .mp-opt .nm{font-weight:700; color:var(--text); font-size:.92rem}
+  .mp-opt .ti{font-size:.72rem; color:var(--muted)}
+  .mp-opt.active, .mp-opt:hover{background:var(--accent-soft)}
+  .mp-opt[aria-selected="true"] .nm{color:var(--accent-strong)}
+  .mp-empty{padding:10px; font-size:.84rem; color:var(--muted)}
+  .mp-other{margin-top:8px}
+  html[data-skin="encontro"] .mp-list{border:2px solid var(--navy); box-shadow:4px 4px 0 var(--navy)}
+  html[data-skin="encontro"] .mp-group{color:var(--pink)}
+  html[data-skin="encontro"] .mp-opt.active, html[data-skin="encontro"] .mp-opt:hover{background:var(--pink-tint)}
+  html[data-skin="encontro"] .mp-opt[aria-selected="true"] .nm{color:var(--pink-deep)}
+  .check{display:inline-flex; align-items:center; gap:8px; font-size:.8rem; font-weight:600; color:var(--label); cursor:pointer; user-select:none; align-self:flex-start}
+  .check input{width:18px; height:18px; accent-color:var(--accent-strong); margin:0; flex:none; cursor:pointer}
+  html[data-skin="encontro"] .check{font-weight:700}
+  html[data-skin="encontro"] .check input{accent-color:var(--pink)}
+  .input:disabled{background:var(--bg); color:var(--muted); cursor:not-allowed}
+  body.view-public.fit-3 .check{font-size:.74rem}
 
   /* ===== Linhas de Instagram ===== */
   .ig-list{display:flex; flex-direction:column; gap:8px}
@@ -575,19 +605,32 @@
 
   /* Barra de busca e filtros do painel em grade */
   #infToolbar{display:grid; gap:10px; align-items:center;
-    grid-template-columns:minmax(220px,2.2fr) repeat(3,minmax(0,1fr)) auto auto;
-    grid-template-areas:"search uf cat sort reload new"}
+    grid-template-columns:minmax(220px,2.2fr) repeat(4,minmax(0,1fr)) auto auto;
+    grid-template-areas:"search uf cat mod sort reload new"}
   #infToolbar .spacer{display:none}
   #infToolbar .input, #infToolbar select{width:100%; min-width:0}
-  #searchInput{grid-area:search} #ufFilter{grid-area:uf} #catFilter{grid-area:cat} #sortMobile{grid-area:sort}
+  #searchInput{grid-area:search} #ufFilter{grid-area:uf} #catFilter{grid-area:cat} #modFilter{grid-area:mod} #sortMobile{grid-area:sort}
   #btnReload{grid-area:reload} #btnNew{grid-area:new}
   #infToolbar .btn{min-height:44px; white-space:nowrap}
   @media(max-width:1100px){
-    #infToolbar{grid-template-columns:repeat(3,minmax(0,1fr)) auto; grid-template-areas:"search search search new" "uf cat sort reload"}
+    #infToolbar{grid-template-columns:repeat(4,minmax(0,1fr)) auto; grid-template-areas:"search search search search new" "uf cat mod sort reload"}
   }
   @media(max-width:560px){
-    #infToolbar{grid-template-columns:repeat(2,minmax(0,1fr)); grid-template-areas:"search search" "uf cat" "sort reload" "new new"}
+    #infToolbar{grid-template-columns:repeat(2,minmax(0,1fr)); grid-template-areas:"search search" "uf cat" "mod sort" "reload new"}
   }
+
+  .form-line{display:block; font-size:.76rem; font-weight:600; color:var(--muted); line-height:1.3; margin-top:2px}
+  .form-line .sep{opacity:.6}
+  .form-line .reg{white-space:nowrap}
+  /* Tela final: grupo de WhatsApp */
+  .done-wa{margin:16px 0 6px; padding:14px; border-radius:var(--radius-sm); background:rgba(37,211,102,.08); border:1.5px solid rgba(37,211,102,.4);
+    display:flex; flex-direction:column; gap:10px}
+  .done-wa p{margin:0; font-size:.92rem; color:var(--text)}
+  .done-wa .btn{width:100%; white-space:normal; line-height:1.2; text-align:center; text-decoration:none; min-height:50px; font-size:.98rem}
+  .done-wa .btn svg{width:22px; height:22px; flex:none}
+  .done-wa .btn:hover{filter:brightness(.95); text-decoration:none}
+  html[data-skin="encontro"] .done-wa{border:2px solid var(--navy); box-shadow:4px 4px 0 var(--navy); background:#EFFBF3}
+  html[data-skin="encontro"] .done-wa .btn{border:2px solid var(--navy)}
 
   /* Reinscrição: linha derivada da principal, com o que mudou marcado */
   .resub-badge{align-self:flex-start; display:inline-flex; align-items:center; gap:4px; font-size:.68rem; font-weight:800; line-height:1.2;
@@ -922,7 +965,8 @@
         <div class="toolbar" id="infToolbar">
           <input id="searchInput" class="input search" placeholder="Buscar por nome, @, e-mail ou cidade" autocomplete="off" aria-label="Buscar">
           <select id="ufFilter" class="input" aria-label="Filtrar por estado"><option value="">Todos os estados</option></select>
-          <select id="catFilter" class="input" aria-label="Filtrar por categoria"><option value="">Todas as categorias</option></select>
+          <select id="catFilter" class="input" aria-label="Filtrar por categoria"><option value="">Categorias</option></select>
+          <select id="modFilter" class="input" aria-label="Filtrar por modalidade"><option value="">Modalidades</option></select>
           <select id="sortMobile" class="input" aria-label="Ordenar">
             <option value="created_at:desc">Mais recentes</option>
             <option value="created_at:asc">Mais antigos</option>
@@ -1025,6 +1069,187 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 /* ===== Constantes ===== */
 const UFS = ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
 const IG_LABELS = ["Pessoal","Comercial","Outro"];
+const WA_GROUP = "https://chat.whatsapp.com/G06LJDYEmWiFkXVsOSqoNd";
+/* Formações do Sistema Confea/Crea: mesma lista da tabela public.modalities do banco.
+   Fonte: Catálogo de Títulos Profissionais do Confea (jun/2026) e Resolução 1.162/2025. */
+const MODALIDADES = [
+  {"c":"111-01-00","n":"Engenharia Ambiental","g":"Civil","t":"Engenheiro Ambiental"},
+  {"c":"111-02-00","n":"Engenharia Civil","g":"Civil","t":"Engenheiro Civil"},
+  {"c":"111-03-00","n":"Engenharia de Fortificação e Construção","g":"Civil","t":"Engenheiro de Fortificação e Construção"},
+  {"c":"111-06-00","n":"Engenharia Militar","g":"Civil","t":"Engenheiro Militar"},
+  {"c":"111-08-00","n":"Engenharia Sanitária","g":"Civil","t":"Engenheiro Sanitarista"},
+  {"c":"111-09-00","n":"Engenharia Sanitária e Ambiental","g":"Civil","t":"Engenheiro Sanitarista e Ambiental"},
+  {"c":"111-10-00","n":"Engenharia de Infraestrutura Aeronáutica","g":"Civil","t":"Engenheiro de Infraestrutura Aeronáutica"},
+  {"c":"111-12-00","n":"Engenharia Hídrica","g":"Civil","t":"Engenheiro Hídrico"},
+  {"c":"111-13-00","n":"Urbanismo","g":"Civil","t":"Urbanista"},
+  {"c":"111-14-00","n":"Engenharia de Transportes","g":"Civil","t":"Engenheiro de Transportes"},
+  {"c":"111-15-00","n":"Engenharia Ferroviária e de Logística","g":"Civil","t":"Engenheiro Ferroviário e de Logística"},
+  {"c":"111-16-00","n":"Engenharia Ferroviária e Metroviária","g":"Civil","t":"Engenheiro Ferroviário e Metroviário"},
+  {"c":"111-17-00","n":"Engenharia Urbana","g":"Civil","t":"Engenheiro Urbanista"},
+  {"c":"111-18-00","n":"Design de Interiores","g":"Civil","t":"Designer de Interiores"},
+  {"c":"111-19-00","n":"Engenharia de Serviços","g":"Civil","t":"Engenheiro de Serviços"},
+  {"c":"121-01-00","n":"Engenharia de Computação","g":"Eletricista","t":"Engenheiro de Computação"},
+  {"c":"121-02-00","n":"Engenharia de Comunicação","g":"Eletricista","t":"Engenheiro de Comunicação"},
+  {"c":"121-03-00","n":"Engenharia de Controle e Automação","g":"Eletricista","t":"Engenheiro de Controle e Automação"},
+  {"c":"121-06-00","n":"Engenharia de Telecomunicações","g":"Eletricista","t":"Engenheiro de Telecomunicações"},
+  {"c":"121-07-00","n":"Engenharia de Transmissão","g":"Eletricista","t":"Engenheiro de Transmissão"},
+  {"c":"121-08-00","n":"Engenharia Elétrica","g":"Eletricista","t":"Engenheiro Eletricista"},
+  {"c":"121-09-00","n":"Engenharia Eletrônica","g":"Eletricista","t":"Engenheiro em Eletrônica"},
+  {"c":"121-10-00","n":"Engenharia Eletrotécnica","g":"Eletricista","t":"Engenheiro em Eletrotécnica"},
+  {"c":"121-12-00","n":"Engenharia Biomédica","g":"Eletricista","t":"Engenheiro Biomédico"},
+  {"c":"121-13-00","n":"Engenharia de Energia","g":"Eletricista","t":"Engenheiro de Energia"},
+  {"c":"121-14-00","n":"Engenharia de Software","g":"Eletricista","t":"Engenheiro de Software"},
+  {"c":"121-15-00","n":"Engenharia de Robôs","g":"Eletricista","t":"Engenheiro de Robôs"},
+  {"c":"121-16-00","n":"Engenharia da Complexidade","g":"Eletricista","t":"Engenheiro da Complexidade"},
+  {"c":"131-01-00","n":"Engenharia Aeronáutica","g":"Mecânica e Metalúrgica","t":"Engenheiro Aeronáutico"},
+  {"c":"131-02-00","n":"Engenharia Mecânica e de Armamento","g":"Mecânica e Metalúrgica","t":"Engenheiro Mecânico e de Armamento"},
+  {"c":"131-03-00","n":"Engenharia Mecânica e de Automóvel","g":"Mecânica e Metalúrgica","t":"Engenheiro Mecânico e de Automóvel"},
+  {"c":"131-06-00","n":"Engenharia de Produção","g":"Mecânica e Metalúrgica","t":"Engenheiro de Produção"},
+  {"c":"131-08-00","n":"Engenharia Mecânica","g":"Mecânica e Metalúrgica","t":"Engenheiro Mecânico"},
+  {"c":"131-09-00","n":"Engenharia Metalúrgica","g":"Mecânica e Metalúrgica","t":"Engenheiro Metalurgista"},
+  {"c":"131-10-00","n":"Engenharia Naval","g":"Mecânica e Metalúrgica","t":"Engenheiro Naval"},
+  {"c":"131-11-00","n":"Engenharia Mecânica e Elétrica","g":"Mecânica e Metalúrgica","t":"Engenheiro Mecânico Eletricista"},
+  {"c":"131-12-00","n":"Engenharia Acústica","g":"Mecânica e Metalúrgica","t":"Engenheiro Acústico"},
+  {"c":"131-13-00","n":"Engenharia Automotiva","g":"Mecânica e Metalúrgica","t":"Engenheiro Automotivo"},
+  {"c":"131-14-00","n":"Engenharia Aeroespacial","g":"Mecânica e Metalúrgica","t":"Engenheiro Aeroespacial"},
+  {"c":"131-15-00","n":"Engenharia Mecatrônica","g":"Mecânica e Metalúrgica","t":"Engenheiro Mecatrônico"},
+  {"c":"141-01-00","n":"Engenharia de Alimentos","g":"Química","t":"Engenheiro de Alimentos"},
+  {"c":"141-02-00","n":"Engenharia de Materiais","g":"Química","t":"Engenheiro de Materiais"},
+  {"c":"141-06-00","n":"Engenharia Química","g":"Química","t":"Engenheiro Químico"},
+  {"c":"141-07-00","n":"Engenharia Têxtil","g":"Química","t":"Engenheiro Têxtil"},
+  {"c":"141-08-00","n":"Engenharia de Petróleo","g":"Química","t":"Engenheiro de Petróleo"},
+  {"c":"141-09-00","n":"Engenharia de Plástico","g":"Química","t":"Engenheiro de Plástico"},
+  {"c":"141-10-00","n":"Engenharia Bioquímica","g":"Química","t":"Engenheiro Bioquímico"},
+  {"c":"141-11-00","n":"Engenharia Nuclear","g":"Química","t":"Engenheiro Nuclear"},
+  {"c":"141-12-00","n":"Engenharia de Bioprocessos e Biotecnologia","g":"Química","t":"Engenheiro de Bioprocessos e Biotecnologia"},
+  {"c":"151-01-00","n":"Engenharia de Minas","g":"Geologia e Minas","t":"Engenheiro de Minas"},
+  {"c":"151-02-00","n":"Engenharia Geológica","g":"Geologia e Minas","t":"Engenheiro Geólogo"},
+  {"c":"151-03-00","n":"Geologia","g":"Geologia e Minas","t":"Geólogo"},
+  {"c":"151-04-00","n":"Engenharia de Exploração e Produção de Petróleo","g":"Geologia e Minas","t":"Engenheiro de Exploração e Produção de Petróleo"},
+  {"c":"151-05-00","n":"Geofísica","g":"Geologia e Minas","t":"Geofísico"},
+  {"c":"161-01-00","n":"Agrimensura","g":"Agrimensura","t":"Agrimensor"},
+  {"c":"161-02-00","n":"Engenharia de Agrimensura","g":"Agrimensura","t":"Engenheiro Agrimensor"},
+  {"c":"161-03-00","n":"Engenharia Cartográfica","g":"Agrimensura","t":"Engenheiro Cartógrafo"},
+  {"c":"161-05-00","n":"Engenharia de Geodésia","g":"Agrimensura","t":"Engenheiro de Geodésia"},
+  {"c":"161-06-00","n":"Engenharia de Topografia Rural","g":"Agrimensura","t":"Engenheiro em Topografia Rural"},
+  {"c":"161-07-00","n":"Engenharia Geográfica","g":"Agrimensura","t":"Engenheiro Geógrafo"},
+  {"c":"161-08-00","n":"Engenharia Topográfica","g":"Agrimensura","t":"Engenheiro Topógrafo"},
+  {"c":"161-09-00","n":"Geografia","g":"Agrimensura","t":"Geógrafo"},
+  {"c":"161-10-00","n":"Engenharia de Agrimensura e Cartográfica","g":"Agrimensura","t":"Engenheiro Agrimensor e Cartógrafo"},
+  {"c":"311-01-00","n":"Engenharia Agrícola","g":"Agronomia","t":"Engenheiro Agrícola"},
+  {"c":"311-02-00","n":"Agronomia","g":"Agronomia","t":"Engenheiro Agrônomo"},
+  {"c":"311-03-00","n":"Engenharia de Pesca","g":"Agronomia","t":"Engenheiro de Pesca"},
+  {"c":"311-04-00","n":"Engenharia Florestal","g":"Agronomia","t":"Engenheiro Florestal"},
+  {"c":"311-05-00","n":"Meteorologia","g":"Agronomia","t":"Meteorologista"},
+  {"c":"311-06-00","n":"Engenharia Agroindustrial","g":"Agronomia","t":"Engenheiro Agroindustrial"},
+  {"c":"311-07-00","n":"Engenharia de Aquicultura","g":"Agronomia","t":"Engenheiro de Aquicultura"},
+  {"c":"311-08-00","n":"Engenharia Agrícola e Ambiental","g":"Agronomia","t":"Engenheiro Agrícola e Ambiental"},
+  {"c":"311-09-00","n":"Engenharia de Agronegócios","g":"Agronomia","t":"Engenheiro de Agronegócios"},
+  {"c":"424-01-00","n":"Engenharia de Segurança do Trabalho","g":"Segurança do Trabalho","t":"Engenheiro de Segurança do Trabalho"},
+  {"c":"421-02-00","n":"Engenharia de Saúde e Segurança","g":"Segurança do Trabalho","t":"Engenheiro de Saúde e Segurança"},
+  {"c":"422-01-00","n":"Tecnologia em Segurança do Trabalho","g":"Segurança do Trabalho","t":"Tecnólogo de Segurança do Trabalho"},
+  {"c":"423-01-00","n":"Técnico em Segurança do Trabalho","g":"Segurança do Trabalho","t":"Técnico de Segurança do Trabalho"},
+  {"c":"OUTROS","n":"Outros","g":"Outra formação","t":""}
+];
+const fold = s => String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
+MODALIDADES.forEach(m=>{ m.k = fold(m.n+" "+m.t+" "+m.g); });
+const MOD_BY_CODE = new Map(MODALIDADES.map(m=>[m.c,m]));
+const MOD_GROUPS = [...new Set(MODALIDADES.map(m=>m.g))];
+function modGroupLabel(g){ return (g==="Agronomia") ? "Grupo Agronomia" : (g==="Segurança do Trabalho" || g==="Outra formação") ? g : "Modalidade "+g; }
+function modLabel(row){
+  if(!row || !row.modality_code) return "";
+  if(row.modality_code==="OUTROS") return row.modality_other || "Outros";
+  return row.modality || (MOD_BY_CODE.get(row.modality_code)||{}).n || "";
+}
+function regLabel(row){ return row && row.no_registry ? "Sem registro no Crea" : (row && row.crea_number ? "Crea "+row.crea_number : ""); }
+
+/* Campo de modalidade com busca: digita parte do nome (sem precisar de acento) e escolhe na lista */
+function modalityPicker(px, code, other){
+  let sel = MOD_BY_CODE.get(code||"") || null, prev = sel;
+  const listId = px+"_mod_list";
+  const selText = ()=> sel ? (sel.c==="OUTROS" ? "Outros" : sel.n) : "";
+  const wrap = h("div",{class:"mp"});
+  const inp = h("input",{class:"input mp-input", id:px+"_modality_in", type:"text", role:"combobox", autocomplete:"off", spellcheck:"false",
+    "aria-autocomplete":"list", "aria-expanded":"false", "aria-controls":listId, enterkeyhint:"next",
+    placeholder:"Digite: civil, elétrica, produção...", value: selText()});
+  const tog = h("button",{class:"mp-toggle", type:"button", tabindex:"-1", "aria-label":"Mostrar todas as modalidades",
+    html:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>'});
+  const list = h("ul",{class:"mp-list", id:listId, role:"listbox", "aria-label":"Modalidades", hidden:true});
+  const otherInp = h("input",{class:"input", id:px+"_modality_other", type:"text", maxlength:"80", placeholder:"Escreva a sua formação",
+    value: other||"", "aria-label":"Qual é a sua formação"});
+  const otherWrap = h("div",{class:"mp-other", hidden: !(sel && sel.c==="OUTROS")}, otherInp);
+  wrap.append(h("div",{class:"mp-box"}, inp, tog), list, otherWrap);
+  let opts = [], active = -1, open = false;
+  const api = { el:wrap, input:inp, other:otherInp, code:()=> sel ? sel.c : "", otherText:()=> otherInp.value.trim() };
+
+  function setActive(i){
+    opts.forEach((o,j)=> o.li.classList.toggle("active", j===i));
+    active = i;
+    if(i>=0 && opts[i]){ inp.setAttribute("aria-activedescendant", opts[i].li.id); opts[i].li.scrollIntoView({block:"nearest"}); }
+    else inp.removeAttribute("aria-activedescendant");
+  }
+  function render(q){
+    clear(list); opts = [];
+    const terms = fold(q).split(/\s+/).filter(Boolean);
+    let lastG = null, found = 0;
+    for(const m of MODALIDADES){
+      const isOther = m.c==="OUTROS";
+      if(!isOther && !terms.every(t=> m.k.includes(t))) continue;
+      if(!isOther) found++;
+      if(m.g!==lastG){ list.append(h("li",{class:"mp-group", role:"presentation", text:modGroupLabel(m.g)})); lastG = m.g; }
+      const li = h("li",{class:"mp-opt", role:"option", id:listId+"_"+m.c.replace(/\W/g,""), "aria-selected": sel && sel.c===m.c ? "true" : "false"},
+        h("span",{class:"nm", text: isOther ? "Outros (escrever a formação)" : m.n}),
+        m.t ? h("span",{class:"ti", text:"Título: "+m.t}) : null);
+      li.addEventListener("mousedown", e=> e.preventDefault());
+      li.addEventListener("click", ()=> choose(m, q));
+      list.append(li); opts.push({li, m});
+    }
+    if(terms.length && !found) list.prepend(h("li",{class:"mp-empty", role:"presentation", text:"Nenhuma modalidade com esse nome. Escolha Outros e escreva a sua formação."}));
+    setActive(terms.length ? 0 : opts.findIndex(o=> sel && o.m.c===sel.c));
+  }
+  function show(q){
+    // no celular, sobe o campo para o topo para a lista caber acima do teclado
+    if(!open && isSmallScreen()) setTimeout(()=> wrap.scrollIntoView({block:"start", behavior: reduceMotion.matches ? "auto" : "smooth"}), 60);
+    render(q); list.hidden = false; open = true; wrap.classList.add("open"); inp.setAttribute("aria-expanded","true"); }
+  function hide(){ list.hidden = true; open = false; wrap.classList.remove("open"); inp.setAttribute("aria-expanded","false"); inp.removeAttribute("aria-activedescendant"); }
+  function choose(m, q){
+    sel = m; prev = m; inp.value = selText(); hide();
+    const isOther = m.c==="OUTROS";
+    otherWrap.hidden = !isOther;
+    if(isOther){
+      const typed = (q||"").trim();
+      if(!otherInp.value && typed && fold(typed)!=="outros") otherInp.value = typed;
+      setTimeout(()=> otherInp.focus(), 0);
+    }
+    inp.dispatchEvent(new Event("change", {bubbles:true}));
+    scheduleFit();
+  }
+  let quiet = false;
+  inp._quietFocus = ()=>{ quiet = true; inp.focus({preventScroll:false}); quiet = false; };   // foco vindo do sistema não abre a lista
+  inp.addEventListener("focus", ()=>{ if(!quiet) show(""); });
+  inp.addEventListener("click", ()=>{ if(!open) show(""); });
+  inp.addEventListener("input", ()=>{ sel = null; show(inp.value); });
+  inp.addEventListener("blur", ()=> setTimeout(()=>{
+    if(document.activeElement===inp) return;
+    hide();
+    if(!sel){
+      const f = fold(inp.value).trim();
+      const exact = f && MODALIDADES.find(m=> fold(m.n)===f || (m.t && fold(m.t)===f));
+      if(exact) choose(exact, inp.value);
+      else { sel = prev; inp.value = selText(); }
+    }
+  }, 120));
+  inp.addEventListener("keydown", e=>{
+    if(e.key==="ArrowDown"){ e.preventDefault(); if(!open) show(""); else setActive(Math.min(opts.length-1, active+1)); }
+    else if(e.key==="ArrowUp"){ e.preventDefault(); if(open) setActive(Math.max(0, active-1)); }
+    else if(e.key==="Enter"){ if(open && active>=0){ e.preventDefault(); e.stopPropagation(); choose(opts[active].m, inp.value); } }
+    else if(e.key==="Escape"){ if(open){ e.preventDefault(); e.stopPropagation(); hide(); } }
+    else if(e.key==="Tab"){ if(open && !sel && active>=0 && fold(inp.value).trim()) choose(opts[active].m, inp.value); }
+  });
+  tog.addEventListener("mousedown", e=> e.preventDefault());
+  tog.addEventListener("click", ()=>{ if(open) hide(); else { inp.focus(); show(""); } });
+  return api;
+}
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
 /* ===== Ícones (conteúdo fixo, nunca dados do usuário) ===== */
@@ -1252,7 +1477,7 @@ function renderForm(host, opts){
     ));
   }
 
-  const STEPS = ["Seus dados","Instagram","Endereço"];
+  const STEPS = ["Seus dados","Formação","Endereço"];
   const stepsNav = h("ol",{class:"steps", "aria-label":"Etapas"});
   const stepBtns = [];
   STEPS.forEach((label,i)=>{
@@ -1297,8 +1522,26 @@ function renderForm(host, opts){
   F.phone.addEventListener("input", ()=>{ F.phone.value = maskPhone(F.phone.value); });
   field(g1, "phone", "Celular com DDD", F.phone, {w:"c-3", mid:5});
 
-  // --- Passo 2: Instagram ---
-  const g2 = stepBox(2, "Instagram");
+  // --- Passo 2: formação e Instagram ---
+  const g2 = stepBox(2, "Formação e Instagram");
+  // formação: modalidade (lista oficial com busca) e registro no Crea
+  const needForm = mode !== "admin-edit";   // cadastros antigos podem ser editados sem esses dados
+  const mp = modalityPicker(px, data.modality_code, data.modality_other);
+  const modWrap = field(g2, "modality", "Modalidade da sua formação", mp.el, {w:"c-8", mid:7});
+  modWrap.querySelector("label").htmlFor = mp.input.id;
+  F.crea_number = h("input",{class:"input", type:"text", value:data.crea_number||"", placeholder:"Só números", inputmode:"numeric", autocomplete:"off", enterkeyhint:"next"});
+  F.crea_number.addEventListener("input", ()=>{ F.crea_number.value = onlyDigits(F.crea_number.value).slice(0,12); });
+  const regWrap = field(g2, "crea_number", "Nº de registro no Crea", F.crea_number, {w:"c-4", mid:5});
+  F.no_registry = h("input",{type:"checkbox", id:px+"_noreg"});
+  F.no_registry.checked = !!data.no_registry;
+  regWrap.append(h("label",{class:"check", for:px+"_noreg"}, F.no_registry, h("span",{text:"Ainda não tenho registro"})));
+  function syncReg(){
+    const off = F.no_registry.checked;
+    F.crea_number.disabled = off;
+    if(off){ F.crea_number.value = ""; clearErr(regWrap); }
+    F.crea_number.placeholder = off ? "Sem registro" : "Só números";
+  }
+  F.no_registry.addEventListener("change", syncReg); syncReg();
   const igWrap = h("div",{class:"field c-12"});
   const btnAddIg = h("button",{class:"btn ghost sm ig-add", type:"button", text:"+ Outro perfil"});
   igWrap.append(h("div",{class:"ig-head"}, h("label",{for:px+"_ig0"}, "Perfis de Instagram", h("span",{class:"opt", text:"  (pessoal, comercial...)"})), btnAddIg));
@@ -1413,6 +1656,13 @@ function renderForm(host, opts){
     {s:1, el:F.full_name, ok:()=>F.full_name.value.trim().length>=3, msg:"Informe o nome completo."},
     {s:1, el:F.email, ok:()=>/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(F.email.value.trim()), msg:"Confira o e-mail. Exemplo: nome@gmail.com"},
     {s:1, el:F.phone, ok:()=>onlyDigits(F.phone.value).length===11, msg:"Use DDD + 9 dígitos. Exemplo: (11)91234-5678"},
+    {s:2, el:mp.input, wrap:modWrap, ok:()=> !!mp.code() || !needForm, msg:"Escolha a modalidade da sua formação (ou Outros)."},
+    {s:2, el:mp.other, wrap:modWrap, ok:()=> mp.code()!=="OUTROS" || mp.otherText().length>=2, msg:"Escreva qual é a sua formação."},
+    {s:2, el:F.crea_number, wrap:regWrap, ok:()=>{
+      if(F.no_registry.checked) return true;
+      const n = onlyDigits(F.crea_number.value).length;
+      return (n>=4 && n<=12) || (!needForm && n===0);
+    }, msg:"Informe o número de registro no Crea (só números) ou marque “Ainda não tenho registro”."},
     {s:2, el:()=>igRows.querySelector("input"), wrap:igWrap, ok:()=>collectIg().length>0, msg:"Informe pelo menos um @ do Instagram."},
     {s:3, el:F.cep, ok:()=>onlyDigits(F.cep.value).length===8, msg:"O CEP tem 8 dígitos."},
     {s:3, el:F.address, ok:()=>F.address.value.trim(), msg:"Informe o logradouro."},
@@ -1435,16 +1685,17 @@ function renderForm(host, opts){
   }
   function validate(upTo){
     let first = null;
+    const failed = new Set();   // um campo com duas regras não pode ter o erro apagado pela segunda
     for(const c of checks){
       if(c.s > upTo) continue;
       const el = typeof c.el==="function" ? c.el() : c.el;
       const wrap = c.wrap || (el ? el.closest(".field") : null);
-      if(!c.ok()){ setErr(wrap, c.msg); if(!first) first = {c, el}; }
-      else clearErr(wrap);
+      if(!c.ok()){ if(!failed.has(wrap)){ setErr(wrap, c.msg); failed.add(wrap); } if(!first) first = {c, el}; }
+      else if(!failed.has(wrap)) clearErr(wrap);
     }
     if(first){
       if(isWizard()) goTo(first.c.s, false);
-      if(first.el) first.el.focus({preventScroll:false});
+      if(first.el){ if(first.el._quietFocus) first.el._quietFocus(); else first.el.focus({preventScroll:false}); }
       toast(first.c.msg, "err");
       return false;
     }
@@ -1490,7 +1741,7 @@ function renderForm(host, opts){
     cur = Math.max(1, Math.min(3, n));
     paint(dirLeft);
     const firstInput = stepEls[cur].querySelector("input, select");
-    if(firstInput && checkBefore !== null) setTimeout(()=>firstInput.focus({preventScroll:true}), 60);
+    if(firstInput && checkBefore !== null) setTimeout(()=>{ if(firstInput._quietFocus) firstInput._quietFocus(); else firstInput.focus({preventScroll:true}); }, 60);
   }
   function paint(dirLeft){
     const wiz = isWizard();
@@ -1526,7 +1777,11 @@ function renderForm(host, opts){
       address: F.address.value.trim(),
       neighborhood: F.neighborhood.value.trim(),
       address_number: F.address_number.value.trim(),
-      complement: F.complement.value.trim() || null
+      complement: F.complement.value.trim() || null,
+      crea_number: F.no_registry.checked ? null : (onlyDigits(F.crea_number.value) || null),
+      no_registry: F.no_registry.checked ? true : null,
+      modality_code: mp.code() || null,
+      modality_other: mp.code()==="OUTROS" ? (mp.otherText() || null) : null
     };
     if(F.category_id) v.category_id = F.category_id.value || null;
     return v;
@@ -1575,6 +1830,9 @@ function showDonePanel(){
     h("p",{class:"muted", text: evt
       ? "Recebemos seus dados. Agora você faz parte do banco de produtores de conteúdo."
       : "Recebemos seus dados com sucesso. Obrigado por se cadastrar!"}),
+    h("div",{class:"done-wa"},
+      h("p",{}, h("b",{text:"Último passo: "}), "entre no grupo de WhatsApp dos produtores de conteúdo."),
+      h("a",{class:"btn wa", href:WA_GROUP, target:"_blank", rel:"noopener", html: ICON_WA + "<span>Entrar no grupo Multiplicadores/Conteúdo CREA-SP</span>"})),
     evt ? h("p",{class:"done-evt"}, "Vai ao Encontro no dia 11/12? ",
       h("a",{href:"https://www.sympla.com.br/especial-influenciadores-2026/3650566", target:"_blank", rel:"noopener", text:"Garanta sua vaga no Sympla"})) : null,
     h("div",{class:"btn-row"}, h("button",{class:"btn ghost", type:"button", text: evt ? "Cadastrar outra pessoa" : "Fazer outro cadastro", onclick:()=>{ renderPublicForm(); byId("formCard").scrollIntoView({behavior:"smooth", block:"start"}); }}))
@@ -1668,6 +1926,7 @@ byId("ufFilter").addEventListener("change", renderTable);
 byId("logSearch").addEventListener("input", renderLogs);
 ["painel","categorias","aparencia","logs"].forEach(t=> byId("tab-"+t).addEventListener("click", ()=>switchTab(t)));
 byId("catFilter").addEventListener("change", renderTable);
+byId("modFilter").addEventListener("change", renderTable);
 byId("sortMobile").addEventListener("change", e=>{ const [k,d]=e.target.value.split(":"); admin.sortKey=k; admin.sortDir=d; renderTable(); });
 byId("btnAddCat").addEventListener("click", addCategory);
 byId("newCatInput").addEventListener("keydown", e=>{ if(e.key==="Enter") addCategory(); });
@@ -1713,6 +1972,11 @@ function populateUfFilter(){
   const sel = byId("ufFilter");
   if(sel.children.length>1) return;
   UFS.forEach(u => sel.append(h("option",{value:u, text:u})));
+  const ms = byId("modFilter");
+  if(ms.children.length<=1){
+    MOD_GROUPS.forEach(g => ms.append(h("option",{value:g, text:modGroupLabel(g)})));
+    ms.append(h("option",{value:"__none__", text:"Sem modalidade informada"}));
+  }
 }
 
 /* Carrega tudo e agrupa as reinscrições sob o cadastro principal (o primeiro da pessoa).
@@ -1748,7 +2012,7 @@ function buildGroups(){
   }
 }
 const DIFF_FIELDS = [
-  ["full_name","Nome"],["email","E-mail"],["phone","Celular"],["instagrams","Instagram"],["cep","CEP"],
+  ["full_name","Nome"],["email","E-mail"],["phone","Celular"],["instagrams","Instagram"],["modality","Modalidade"],["crea_number","Registro no Crea"],["cep","CEP"],
   ["address","Logradouro"],["address_number","Número"],["complement","Complemento"],["neighborhood","Bairro"],["city","Cidade"],["uf","Estado"]
 ];
 function igKey(list){ return (list||[]).map(i=>(i.handle||"")+"|"+(i.label||"")).sort().join(","); }
@@ -1756,6 +2020,8 @@ function diffRows(a, b){
   const out = new Set();
   for(const [k] of DIFF_FIELDS){
     if(k==="instagrams"){ if(igKey(a.instagrams)!==igKey(b.instagrams)) out.add(k); continue; }
+    if(k==="modality"){ if(fold(modLabel(a))!==fold(modLabel(b))) out.add(k); continue; }
+    if(k==="crea_number"){ if(regLabel(a)!==regLabel(b)) out.add(k); continue; }
     const va = (a[k]==null?"":String(a[k])).trim().toLowerCase(), vb = (b[k]==null?"":String(b[k])).trim().toLowerCase();
     if(va!==vb) out.add(k);
   }
@@ -1791,7 +2057,7 @@ function catCount(id){ return (admin.roots||[]).filter(r=>r.category_id===id).le
 function populateCatFilter(){
   const sel = byId("catFilter"); const cur = sel.value;
   clear(sel);
-  sel.append(h("option",{value:"", text:"Todas as categorias"}));
+  sel.append(h("option",{value:"", text:"Categorias"}));
   admin.categories.forEach(c=> sel.append(h("option",{value:c.id, text:c.name})));
   sel.append(h("option",{value:"__none__", text:"Sem categoria"}));
   sel.value = cur || "";
@@ -1956,11 +2222,15 @@ function getFiltered(){
   const term = byId("searchInput").value.trim().toLowerCase().replace(/^@/,"");
   const uf = byId("ufFilter").value;
   const cat = byId("catFilter").value;
+  const mod = byId("modFilter").value;
   const match = r=>{
     if(uf && r.uf!==uf) return false;
+    if(mod){ if(mod==="__none__"){ if(r.modality_code) return false; } else if(r.modality_group!==mod) return false; }
     if(!term) return true;
     const igs = (r.instagrams||[]).map(i=>i.handle).join(" ");
     return (r.full_name||"").toLowerCase().includes(term)
+        || fold(modLabel(r)).includes(fold(term))
+        || (r.crea_number||"").includes(onlyDigits(term) || "\u0000")
         || (r.email||"").toLowerCase().includes(term)
         || (r.city||"").toLowerCase().includes(term)
         || onlyDigits(r.phone).includes(onlyDigits(term) || "\u0000")
@@ -2074,6 +2344,14 @@ function infRow(row, o){
   const cat = catId ? catName(catId) : "";
   const dt = fmtDateTime(row.created_at).split(" ");
   const txt = h("div",{class:"person-txt"}, mark("full_name", h("strong",{text:row.full_name})));
+  const ml = modLabel(row), rl = regLabel(row);
+  if(ml || rl){
+    const fl = h("span",{class:"form-line"});
+    if(ml) fl.append(mark("modality", h("span",{text:ml, title: row.modality_group ? modGroupLabel(row.modality_group) : ""})));
+    if(ml && rl) fl.append(h("span",{class:"sep", text:" · "}));
+    if(rl) fl.append(mark("crea_number", h("span",{class:"reg", text:rl})));
+    txt.append(fl);
+  }
   if(o.deriv){
     txt.append(h("span",{class:"resub-badge", text: o.n+"ª inscrição"}));
     const labels = DIFF_FIELDS.filter(([k])=>chg.has(k)).map(([,l])=>l);
