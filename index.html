@@ -1100,6 +1100,7 @@ function syncSkinTexts(){
   if(ft && !publicState.done) ft.textContent = evt ? "Faça sua inscrição" : "Novo cadastro";
   if(publicState.submitBtn) publicState.submitBtn.textContent = evt ? "Confirmar inscrição" : "Concluir cadastro";
 }
+let skinRetry = 0;
 async function loadOfficialSkin(){
   try{
     const { data, error } = await sb.from("app_settings").select("value, updated_at, updated_by").eq("key","theme").maybeSingle();
@@ -1112,7 +1113,12 @@ async function loadOfficialSkin(){
     if(!skinState.preview) applySkin(skinState.official);
   }catch(e){
     document.documentElement.classList.remove("skin-loading");
+    // internet instável: tenta de novo (2 s, depois 6 s) para não ficar na identidade errada
+    skinRetry = (skinRetry||0) + 1;
+    if(skinRetry <= 2) setTimeout(loadOfficialSkin, skinRetry===1 ? 2000 : 6000);
+    return;
   }
+  skinRetry = 0;
   if(!byId("panel-aparencia").hidden) renderSkins();
 }
 async function setOfficialSkin(id){
