@@ -379,7 +379,7 @@
     .form-grid > .field[data-k="city"]{order:6}
     .form-grid > .field[data-k="uf"]{order:7}
     .form-grid > .field[data-k="category_id"]{order:8}
-    .ig-head .opt{display:none}
+    .ig-head .opt:not(.keep){display:none}
     .help.is-default{display:none}
     .btn-row{flex-wrap:nowrap}
     .btn-row .grow{display:none}
@@ -426,6 +426,20 @@
   @media(max-width:520px){ .ig-row{grid-template-columns:minmax(0,1fr) 108px 44px} }
   .ig-head{display:flex; align-items:flex-end; justify-content:space-between; gap:10px}
   .ig-add{min-height:32px; padding:4px 11px; font-size:.8rem; white-space:nowrap; flex:none}
+
+  /* ===== Outras redes sociais (opcionais) ===== */
+  .soc-list{display:flex; flex-direction:column; gap:8px}
+  .soc-list:empty{display:none}
+  .soc-row{display:grid; grid-template-columns:150px minmax(0,1fr) 140px 44px; gap:8px; align-items:center}
+  @media(max-width:520px){
+    .soc-row{grid-template-columns:minmax(0,1fr) 108px 44px}
+    .soc-row .soc-in{grid-column:1 / -1; grid-row:2}
+  }
+  .soc-line{display:flex; align-items:center; gap:6px; flex-wrap:wrap; line-height:1.3; font-size:.86em}
+  .soc-line .net{font-weight:700; color:var(--muted)}
+  .soc-line a{min-width:0; overflow-wrap:anywhere}
+  .soc-line .tag{font-size:.64rem; padding:1px 7px}
+  .soc-line.chg{padding:1px 4px}
 
   /* ===== Botões ===== */
   .btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:44px;
@@ -605,18 +619,18 @@
 
   /* Barra de busca e filtros do painel em grade */
   #infToolbar{display:grid; gap:10px; align-items:center;
-    grid-template-columns:minmax(220px,2.2fr) repeat(4,minmax(0,1fr)) auto auto;
-    grid-template-areas:"search uf cat mod sort reload new"}
+    grid-template-columns:minmax(200px,1.7fr) repeat(4,minmax(0,1fr)) auto auto auto;
+    grid-template-areas:"search uf cat mod sort reload xls new"}
   #infToolbar .spacer{display:none}
   #infToolbar .input, #infToolbar select{width:100%; min-width:0}
   #searchInput{grid-area:search} #ufFilter{grid-area:uf} #catFilter{grid-area:cat} #modFilter{grid-area:mod} #sortMobile{grid-area:sort}
-  #btnReload{grid-area:reload} #btnNew{grid-area:new}
+  #btnReload{grid-area:reload} #btnNew{grid-area:new} #btnExcel{grid-area:xls}
   #infToolbar .btn{min-height:44px; white-space:nowrap}
   @media(max-width:1100px){
-    #infToolbar{grid-template-columns:repeat(4,minmax(0,1fr)) auto; grid-template-areas:"search search search search new" "uf cat mod sort reload"}
+    #infToolbar{grid-template-columns:repeat(4,minmax(0,1fr)) auto auto; grid-template-areas:"search search search search xls new" "uf cat mod sort reload reload"}
   }
   @media(max-width:560px){
-    #infToolbar{grid-template-columns:repeat(2,minmax(0,1fr)); grid-template-areas:"search search" "uf cat" "mod sort" "reload new"}
+    #infToolbar{grid-template-columns:repeat(2,minmax(0,1fr)); grid-template-areas:"search search" "uf cat" "mod sort" "reload xls" "new new"}
   }
 
   .form-line{display:block; font-size:.76rem; font-weight:600; color:var(--muted); line-height:1.3; margin-top:2px}
@@ -979,6 +993,7 @@
           </select>
           <div class="spacer"></div>
           <button id="btnReload" class="btn ghost sm">Atualizar</button>
+          <button id="btnExcel" class="btn ghost sm" title="Baixar planilha com todos os cadastros (só administradores)">Exportar Excel</button>
           <button id="btnNew" class="btn sm">+ Novo cadastro</button>
         </div>
 
@@ -1069,6 +1084,19 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 /* ===== Constantes ===== */
 const UFS = ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
 const IG_LABELS = ["Pessoal","Comercial","Outro"];
+/* Outras redes (opcionais). Mesma lista da tabela public.social_networks do banco. */
+const SOCIAL_NETWORKS = [
+  {value:"linkedin", label:"LinkedIn",     ph:"usuário ou link do perfil", url:"https://www.linkedin.com/in/"},
+  {value:"tiktok",   label:"TikTok",       ph:"@usuario",                  url:"https://www.tiktok.com/@"},
+  {value:"youtube",  label:"YouTube",      ph:"@canal ou link",            url:"https://www.youtube.com/@"},
+  {value:"facebook", label:"Facebook",     ph:"usuário ou link",           url:"https://www.facebook.com/"},
+  {value:"x",        label:"X (Twitter)",  ph:"@usuario",                  url:"https://x.com/"},
+  {value:"threads",  label:"Threads",      ph:"@usuario",                  url:"https://www.threads.net/@"},
+  {value:"kwai",     label:"Kwai",         ph:"@usuario",                  url:"https://www.kwai.com/@"},
+  {value:"site",     label:"Site ou blog", ph:"www.seusite.com.br",        url:null},
+  {value:"outra",    label:"Outra rede",   ph:"link do perfil",            url:null}
+];
+const socNet = code => SOCIAL_NETWORKS.find(n=>n.value===code) || {value:code, label:code, url:null};
 const WA_GROUP = "https://chat.whatsapp.com/G06LJDYEmWiFkXVsOSqoNd";
 /* Formações do Sistema Confea/Crea: mesma lista da tabela public.modalities do banco.
    Fonte: Catálogo de Títulos Profissionais do Confea (jun/2026) e Resolução 1.162/2025. */
@@ -1523,7 +1551,7 @@ function renderForm(host, opts){
   field(g1, "phone", "Celular com DDD", F.phone, {w:"c-3", mid:5});
 
   // --- Passo 2: formação e Instagram ---
-  const g2 = stepBox(2, "Formação e Instagram");
+  const g2 = stepBox(2, "Formação e redes sociais");
   // formação: modalidade (lista oficial com busca) e registro no Crea
   const needForm = mode !== "admin-edit";   // cadastros antigos podem ser editados sem esses dados
   const mp = modalityPicker(px, data.modality_code, data.modality_other);
@@ -1569,6 +1597,48 @@ function renderForm(host, opts){
       if(handle) igs.push({handle, label});
     });
     return igs;
+  }
+
+  // outras redes sociais: opcionais, várias por rede, pessoal ou comercial
+  const socWrap = h("div",{class:"field c-12"});
+  const btnAddSoc = h("button",{class:"btn ghost sm ig-add", type:"button", text:"+ Adicionar rede"});
+  socWrap.append(h("div",{class:"ig-head"}, h("label",{for:px+"_socn0"}, "Outras redes", h("span",{class:"opt keep", text:" (opcional)"}), h("span",{class:"opt", text:" LinkedIn, TikTok, YouTube..."})), btnAddSoc));
+  const socRows = h("div",{class:"soc-list"});
+  socWrap.append(socRows);
+  g2.append(socWrap);
+  let socCount = 0;
+  function addSocRow(network, value, label){
+    const n = socCount++;
+    const row = h("div",{class:"soc-row"});
+    const net = selectEl(SOCIAL_NETWORKS.map(s=>({value:s.value, label:s.label})), network||"linkedin", {class:"input", id:px+"_socn"+n, "aria-label":"Rede social"});
+    const inp = h("input",{class:"input soc-in", id:px+"_soc"+n, type:"text", value:value||"", autocomplete:"off", autocapitalize:"none", spellcheck:"false", "aria-label":"Usuário ou link do perfil"});
+    const setPh = ()=>{ inp.placeholder = socNet(net.value).ph; };
+    setPh();
+    net.addEventListener("change", ()=>{ setPh(); clearErr(socWrap); });
+    inp.addEventListener("input", ()=> clearErr(socWrap));
+    const lbl = selectEl(IG_LABELS, IG_LABELS.includes(label)?label:(label?"Outro":"Pessoal"), {class:"input", id:px+"_socl"+n, "aria-label":"Tipo de perfil"});
+    const rm = h("button",{class:"btn ghost icon rm", type:"button", title:"Remover rede", "aria-label":"Remover rede", text:"×"});
+    rm.addEventListener("click", ()=>{ row.remove(); clearErr(socWrap); });
+    row.append(net, inp, lbl, rm);
+    socRows.append(row);
+    return inp;
+  }
+  btnAddSoc.addEventListener("click", ()=> addSocRow("linkedin","","Pessoal").focus());
+  (Array.isArray(data.social_profiles) ? data.social_profiles : []).forEach(s =>
+    // perfil montado a partir do usuário volta como usuário; o que veio como link volta como link
+    addSocRow(s.network, (s.handle && socNet(s.network).url && s.url===socNet(s.network).url+s.handle) ? s.handle : (s.url||s.handle||""), s.label||"Pessoal"));
+  function collectSoc(){
+    const out = [];
+    socRows.querySelectorAll(".soc-row").forEach(r=>{
+      const [net, lbl] = r.querySelectorAll("select");
+      const v = r.querySelector("input").value.trim();
+      if(v) out.push({network:net.value, handle:v, label:lbl.value});
+    });
+    return out;
+  }
+  // site e outra rede pedem o endereço completo (com ponto, ex.: www.seusite.com.br)
+  function socBad(){
+    return collectSoc().find(s=> !socNet(s.network).url && !/^(https?:\/\/)?[^\s\/.]+(\.[^\s\/.]+)+/i.test(s.handle));
   }
 
   // --- Passo 3: endereço (CEP primeiro) ---
@@ -1652,6 +1722,8 @@ function renderForm(host, opts){
       return (n>=4 && n<=12) || (!needForm && n===0);
     }, msg:"Informe o número de registro no Crea (só números)."},
     {s:2, el:()=>igRows.querySelector("input"), wrap:igWrap, ok:()=>collectIg().length>0, msg:"Informe pelo menos um @ do Instagram."},
+    {s:2, el:()=>{ const b = socBad(); return b ? Array.from(socRows.querySelectorAll("input")).find(i=>i.value.trim()===b.handle) : null; }, wrap:socWrap,
+      ok:()=>!socBad(), msg:"Em Site ou Outra rede, informe o endereço completo. Exemplo: www.seusite.com.br"},
     {s:3, el:F.cep, ok:()=>onlyDigits(F.cep.value).length===8, msg:"O CEP tem 8 dígitos."},
     {s:3, el:F.address, ok:()=>F.address.value.trim(), msg:"Informe o logradouro."},
     {s:3, el:F.address_number, ok:()=>F.address_number.value.trim(), msg:"Informe o número (ou S/N)."},
@@ -1759,6 +1831,7 @@ function renderForm(host, opts){
       email: F.email.value.trim(),
       phone: F.phone.value.trim(),
       instagrams: collectIg(),
+      social_profiles: collectSoc(),
       uf: F.uf.value,
       city: F.city.value.trim(),
       cep: F.cep.value.trim(),
@@ -1908,6 +1981,7 @@ byId("btnLogout").addEventListener("click", async ()=>{ await sb.auth.signOut();
 byId("btnReload").addEventListener("click", loadAll);
 byId("btnReloadLogs").addEventListener("click", loadLogs);
 byId("btnNew").addEventListener("click", openCreateModal);
+byId("btnExcel").addEventListener("click", exportExcel);
 byId("btnAccount").addEventListener("click", openAccountModal);
 byId("searchInput").addEventListener("input", renderTable);
 byId("ufFilter").addEventListener("change", renderTable);
@@ -2000,14 +2074,16 @@ function buildGroups(){
   }
 }
 const DIFF_FIELDS = [
-  ["full_name","Nome"],["email","E-mail"],["phone","Celular"],["instagrams","Instagram"],["modality","Modalidade"],["crea_number","Registro no Crea"],["cep","CEP"],
+  ["full_name","Nome"],["email","E-mail"],["phone","Celular"],["instagrams","Instagram"],["social_profiles","Outras redes"],["modality","Modalidade"],["crea_number","Registro no Crea"],["cep","CEP"],
   ["address","Logradouro"],["address_number","Número"],["complement","Complemento"],["neighborhood","Bairro"],["city","Cidade"],["uf","Estado"]
 ];
 function igKey(list){ return (list||[]).map(i=>(i.handle||"")+"|"+(i.label||"")).sort().join(","); }
+function socKey(list){ return (list||[]).map(s=>(s.network||"")+"|"+String(s.url||"").toLowerCase()+"|"+(s.label||"")).sort().join(","); }
 function diffRows(a, b){
   const out = new Set();
   for(const [k] of DIFF_FIELDS){
     if(k==="instagrams"){ if(igKey(a.instagrams)!==igKey(b.instagrams)) out.add(k); continue; }
+    if(k==="social_profiles"){ if(socKey(a.social_profiles)!==socKey(b.social_profiles)) out.add(k); continue; }
     if(k==="modality"){ if(fold(modLabel(a))!==fold(modLabel(b))) out.add(k); continue; }
     if(k==="crea_number"){ if(regLabel(a)!==regLabel(b)) out.add(k); continue; }
     const va = (a[k]==null?"":String(a[k])).trim().toLowerCase(), vb = (b[k]==null?"":String(b[k])).trim().toLowerCase();
@@ -2112,6 +2188,347 @@ async function loadLogs(){
   renderLogs();
 }
 
+/* ============================================================
+   EXPORTAR EXCEL (só administradores)
+   A proteção real está no banco: as tabelas só devolvem linhas a quem está em public.admins.
+   Aqui o painel ainda confere a sessão e o is_admin() antes de buscar, e lê tudo de novo do banco.
+   ============================================================ */
+const EXCELJS_SRC = "https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js";
+const EXCELJS_SRI = "sha384-Pqp51FUN2/qzfxZxBCtF0stpc9ONI6MYZpVqmo8m20SoaQCzf+arZvACkLkirlPz";
+let excelLib = null;
+function loadExcelJs(){
+  if(window.ExcelJS) return Promise.resolve(window.ExcelJS);
+  if(excelLib) return excelLib;
+  excelLib = new Promise((ok, fail)=>{
+    const s = document.createElement("script");
+    s.src = EXCELJS_SRC; s.integrity = EXCELJS_SRI; s.crossOrigin = "anonymous"; s.referrerPolicy = "no-referrer";
+    s.onload = ()=> window.ExcelJS ? ok(window.ExcelJS) : fail(new Error("biblioteca não carregou"));
+    s.onerror = ()=>{ excelLib = null; fail(new Error("biblioteca não carregou")); };
+    document.head.append(s);
+  });
+  return excelLib;
+}
+async function fetchAllRows(table, order){
+  const out = [], step = 1000;
+  for(let from = 0; ; from += step){
+    const { data, error } = await sb.from(table).select("*").order(order,{ascending:true}).range(from, from+step-1);
+    if(error) throw error;
+    out.push(...(data||[]));
+    if(!data || data.length < step) return out;
+  }
+}
+
+/* Mesmas regras do Excel de 12/11 (gerar_excel.py) */
+const XL_PARTICULAS = new Set(["da","de","do","das","dos","e","di","du"]);
+const XL_UFS = new Set(UFS.map(u=> typeof u==="object" ? u.value : u));
+const xlLimpar = v => v==null ? "" : String(v).replace(/\s+/g," ").trim();
+function xlNome(v){
+  v = xlLimpar(v); if(!v) return "";
+  return v.toLowerCase().split(" ").map((p,i)=>{
+    if(i>0 && XL_PARTICULAS.has(p)) return p;
+    if(i>0 && p.length===2 && XL_UFS.has(p.toUpperCase())) return p.toUpperCase();
+    return p.split("-").map(s=> s.slice(0,1).toUpperCase()+s.slice(1)).join("-");
+  }).join(" ");
+}
+function xlTelefone(v){
+  let d = onlyDigits(v||"");
+  if(d.startsWith("55") && (d.length===12 || d.length===13)) d = d.slice(2);
+  else if(d.startsWith("55") && d.length===11) return [xlLimpar(v), ""];
+  if(d.length===11) return ["("+d.slice(0,2)+") "+d.slice(2,7)+"-"+d.slice(7), d];
+  if(d.length===10) return ["("+d.slice(0,2)+") "+d.slice(2,6)+"-"+d.slice(6), d];
+  return [xlLimpar(v), d];
+}
+function xlCep(v){ const d = onlyDigits(v||""); return d.length===8 ? d.slice(0,5)+"-"+d.slice(5) : xlLimpar(v); }
+/* data/hora de Brasília gravada como está (o Excel não guarda fuso) */
+const XL_TZ = new Intl.DateTimeFormat("en-CA",{timeZone:"America/Sao_Paulo", year:"numeric", month:"2-digit", day:"2-digit", hour:"2-digit", minute:"2-digit", second:"2-digit", hourCycle:"h23"});
+function xlData(iso){
+  if(!iso) return null;
+  const d = new Date(iso); if(isNaN(d)) return null;
+  const p = Object.fromEntries(XL_TZ.formatToParts(d).map(x=>[x.type, x.value]));
+  return new Date(Date.UTC(+p.year, +p.month-1, +p.day, +p.hour, +p.minute, +p.second));
+}
+function xlIgs(list){
+  return (Array.isArray(list)?list:[]).map(ig=>{
+    let h = xlLimpar(ig && ig.handle).replace(/^@+/,"").toLowerCase();
+    if(!h && ig && ig.url) h = xlLimpar(ig.url).replace(/\/+$/,"").split("/").pop().toLowerCase();
+    return h ? {handle:"@"+h, tipo: xlLimpar(ig.label) || "Não informado", link:"https://instagram.com/"+h} : null;
+  }).filter(Boolean);
+}
+function xlSocs(list){
+  return (Array.isArray(list)?list:[]).filter(s=> s && s.url).map(s=>{
+    const net = socNet(s.network);
+    const perfil = (s.handle && net.url) ? "@"+s.handle : String(s.url).replace(/^https?:\/\/(www\.)?/i,"");
+    return {rede: net.label, perfil, tipo: xlLimpar(s.label) || "Não informado", link: s.url};
+  });
+}
+const XL_CAMPOS = {full_name:"Nome", email:"E-mail", phone:"Celular", instagrams:"Instagram", social_profiles:"Outras redes",
+  crea_number:"Registro no Crea", modality:"Modalidade", cep:"CEP", address:"Logradouro", address_number:"Número",
+  complement:"Complemento", neighborhood:"Bairro", city:"Cidade", uf:"Estado"};
+
+async function exportExcel(){
+  const btn = byId("btnExcel");
+  if(btn.disabled) return;
+  btn.disabled = true; const old = btn.textContent; btn.innerHTML = '<span class="spin"></span> Gerando...';
+  try{
+    // 1. só administrador
+    const { data: sess } = await sb.auth.getSession();
+    if(!sess || !sess.session){ toast("Entre como administrador para exportar.","err"); return; }
+    const { data: isAdm, error: eAdm } = await sb.rpc("is_admin");
+    if(eAdm || isAdm !== true){ toast("Só administradores podem exportar os cadastros.","err"); return; }
+
+    // 2. dados completos e atuais do banco
+    const [inf, logs, cats, ExcelJS] = await Promise.all([
+      fetchAllRows("influencers","created_at"), fetchAllRows("influencer_logs","created_at"),
+      fetchAllRows("categories","name"), loadExcelJs()
+    ]);
+    if(!inf.length){ toast("Nenhum cadastro para exportar.","err"); return; }
+    const catById = new Map(cats.map(c=>[c.id, c.name]));
+
+    // 3. pessoas: inscrição principal + reinscrições; dados da inscrição mais recente
+    const byIdAll = new Map(inf.map(r=>[r.id, r]));
+    const grupos = new Map();
+    for(const r of inf){
+      const root = (r.parent_id && byIdAll.has(r.parent_id)) ? r.parent_id : r.id;
+      if(!grupos.has(root)) grupos.set(root, []);
+      grupos.get(root).push(r);
+    }
+    const pessoas = [];
+    for(const [rootId, lista] of grupos){
+      lista.sort((a,b)=> new Date(a.created_at) - new Date(b.created_at));
+      const root = byIdAll.get(rootId), r = lista[lista.length-1];
+      const [tel, dig] = xlTelefone(r.phone);
+      const igs = xlIgs(r.instagrams), socs = xlSocs(r.social_profiles);
+      const rua = xlNome(r.address), num = xlLimpar(r.address_number), comp = xlLimpar(r.complement);
+      const bairro = xlNome(r.neighborhood), cidade = xlNome(r.city), uf = xlLimpar(r.uf).toUpperCase(), cep = xlCep(r.cep);
+      const end = [rua, num, comp].filter(Boolean).join(", ");
+      const obs = [];
+      if(!dig) obs.push("Telefone incompleto: digitado com o 55 do país e falta um dígito.");
+      if(!r.modality_code) obs.push("Inscrição feita antes da pergunta de modalidade.");
+      if(!r.crea_number && !r.no_registry) obs.push("Inscrição feita antes da pergunta do registro no Crea.");
+      pessoas.push({
+        _root: root, _ult: r, _lista: lista, _igs: igs, _socs: socs, _obs: obs,
+        _wa: (dig.length===10 || dig.length===11) ? "https://wa.me/55"+dig : "",
+        "Nome completo": xlNome(r.full_name),
+        "E-mail": xlLimpar(r.email).toLowerCase(),
+        "Telefone": tel,
+        "WhatsApp": (dig.length===10 || dig.length===11) ? "Abrir conversa" : "",
+        "Modalidade": modLabel(r),
+        "Grupo da modalidade": r.modality_group ? modGroupLabel(r.modality_group) : "",
+        "Registro no Crea": r.no_registry ? "Sem registro" : (r.crea_number || ""),
+        "Categoria": catById.get(root.category_id) || "",
+        "Inscrições": lista.length,
+        "Qtd. de Instagram": igs.length,
+        "Instagram principal": igs[0] ? igs[0].handle : "",
+        "Tipo do principal": igs[0] ? igs[0].tipo : "",
+        "Outros Instagram": igs.slice(1).map(i=> i.handle+" ("+i.tipo+")").join("; "),
+        "Qtd. de outras redes": socs.length,
+        "Outras redes": socs.map(s=> s.rede+": "+s.perfil+" ("+s.tipo+")").join("; "),
+        "UF": uf, "Cidade": cidade, "Bairro": bairro, "Logradouro": rua, "Número": num, "Complemento": comp, "CEP": cep,
+        "Endereço completo": end+", "+bairro+", "+cidade+"/"+uf+", CEP "+cep,
+        "Primeira inscrição": xlData(lista[0].created_at),
+        "Última inscrição": xlData(r.created_at),
+        "Última atualização": xlData(r.updated_at)
+      });
+    }
+    pessoas.sort((a,b)=> a["Nome completo"].localeCompare(b["Nome completo"], "pt-BR", {sensitivity:"base"}));
+    const nomes = new Map();
+    pessoas.forEach(p=>{ const k = fold(p["Nome completo"]); nomes.set(k, (nomes.get(k)||0)+1); });
+    pessoas.forEach(p=>{
+      if(nomes.get(fold(p["Nome completo"]))>1) p._obs.push("Nome aparece em mais de um cadastro (conferir se é duplicado).");
+      p["Observação"] = p._obs.join(" ");
+    });
+    const nomePorId = new Map();
+    pessoas.forEach(p=> p._lista.forEach(r=> nomePorId.set(r.id, p["Nome completo"])));
+
+    // 4. planilha
+    const AZUL = "FF1F3A5F";
+    const agora = new Date();
+    const gerado = fmtDateTime(agora.toISOString());
+    const BORDA = {left:{style:"thin",color:{argb:"FFD9D9D9"}}, right:{style:"thin",color:{argb:"FFD9D9D9"}}, top:{style:"thin",color:{argb:"FFD9D9D9"}}, bottom:{style:"thin",color:{argb:"FFD9D9D9"}}};
+    const LINK = {name:"Calibri", size:11, color:{argb:"FF0563C1"}, underline:true};
+    const wb = new ExcelJS.Workbook();
+    wb.creator = "BLS"; wb.title = "Influenciadores cadastrados"; wb.created = agora;
+
+    function aba(nome, titulo, colunas, linhas, larguras, tabela, o){
+      o = o || {};
+      const fmt = o.formatos || {}, links = o.links || {}, quebra = new Set(o.quebra || []);
+      const ws = wb.addWorksheet(nome, {
+        views:[{state:"frozen", xSplit: colunas.length>6 ? 2 : 0, ySplit:4, zoomScale:100}],
+        pageSetup:{orientation:"landscape", fitToPage:true, fitToWidth:1, fitToHeight:0, paperSize:9}
+      });
+      ws.getCell("A1").value = titulo;
+      ws.getCell("A1").font = {name:"Calibri", size:16, bold:true, color:{argb:AZUL}};
+      ws.getCell("A2").value = "Cadastro de Influenciadores Confea/Crea. Extraído em "+gerado+". "+linhas.length+" registro(s).";
+      ws.getCell("A2").font = {name:"Calibri", size:10, italic:true, color:{argb:"FF595959"}};
+      const rows = linhas.length ? linhas.map(l=> colunas.map(c=>{ const v = l[c]; return (v===""||v==null) ? null : v; })) : [colunas.map(()=>null)];
+      ws.addTable({name:tabela, ref:"A4", headerRow:true, style:{theme:"TableStyleLight9", showRowStripes:true},
+        columns: colunas.map(c=>({name:c, filterButton:true})), rows});
+      const cab = ws.getRow(4); cab.height = 32;
+      colunas.forEach((c,i)=>{
+        const cel = cab.getCell(i+1);
+        cel.fill = {type:"pattern", pattern:"solid", fgColor:{argb:AZUL}};
+        cel.font = {name:"Calibri", size:11, bold:true, color:{argb:"FFFFFFFF"}};
+        cel.alignment = {horizontal:"center", vertical:"middle", wrapText:true};
+        cel.border = BORDA;
+        ws.getColumn(i+1).width = larguras[i] || 14;
+      });
+      linhas.forEach((l, k)=>{
+        const row = ws.getRow(5+k);
+        colunas.forEach((c,i)=>{
+          const cel = row.getCell(i+1);
+          cel.border = BORDA;
+          cel.alignment = {vertical:"top", wrapText: quebra.has(c)};
+          if(fmt[c]){ cel.numFmt = fmt[c]; if(fmt[c]==="0") cel.alignment = {horizontal:"center", vertical:"top"}; }
+          if(links[c] && l[c]){ const url = links[c](l); if(url){ cel.value = {text:String(l[c]), hyperlink:url}; cel.font = LINK; } }
+        });
+      });
+      ws.pageSetup.printTitlesRow = "4:4";
+      return ws;
+    }
+
+    // Aba 1: Influenciadores (uma linha por pessoa)
+    const colsInf = ["Nº","Nome completo","E-mail","Telefone","WhatsApp","Modalidade","Grupo da modalidade","Registro no Crea","Categoria",
+      "Inscrições","Qtd. de Instagram","Instagram principal","Tipo do principal","Outros Instagram","Qtd. de outras redes","Outras redes",
+      "UF","Cidade","Bairro","Logradouro","Número","Complemento","CEP","Endereço completo","Primeira inscrição","Última inscrição","Última atualização","Observação"];
+    pessoas.forEach((p,i)=>{ p["Nº"] = i+1; });
+    aba("Influenciadores","Influenciadores cadastrados", colsInf, pessoas,
+      [6,34,34,17,15,30,24,14,20,11,11,26,16,34,11,44,6,22,22,34,9,18,11,60,17,17,17,44], "Influenciadores", {
+        formatos:{"Nº":"0","Inscrições":"0","Qtd. de Instagram":"0","Qtd. de outras redes":"0",
+          "Primeira inscrição":"dd/mm/yyyy hh:mm","Última inscrição":"dd/mm/yyyy hh:mm","Última atualização":"dd/mm/yyyy hh:mm"},
+        links:{"E-mail": l=>"mailto:"+l["E-mail"], "WhatsApp": l=>l._wa, "Instagram principal": l=> l._igs[0] && l._igs[0].link},
+        quebra:["Outros Instagram","Outras redes","Endereço completo","Observação"]
+      });
+
+    // Aba 2: Perfis de Instagram (um por linha)
+    const linIg = [];
+    pessoas.forEach(p=> p._igs.forEach((ig,k)=> linIg.push({"Nome completo":p["Nome completo"], "Ordem":k+1, "Perfil":ig.handle, "Tipo":ig.tipo, "Link":ig.link, "UF":p.UF, "Cidade":p.Cidade})));
+    aba("Perfis de Instagram","Perfis de Instagram (um por linha)", ["Nome completo","Ordem","Perfil","Tipo","Link","UF","Cidade"], linIg,
+      [34,8,28,16,42,6,22], "PerfisInstagram", {formatos:{"Ordem":"0"}, links:{"Link":l=>l.Link, "Perfil":l=>l.Link}});
+
+    // Aba 3: Outras redes (uma por linha)
+    const linSoc = [];
+    pessoas.forEach(p=> p._socs.forEach((s,k)=> linSoc.push({"Nome completo":p["Nome completo"], "Ordem":k+1, "Rede":s.rede, "Perfil":s.perfil, "Tipo":s.tipo, "Link":s.link, "UF":p.UF, "Cidade":p.Cidade})));
+    aba("Outras redes","Outras redes sociais (uma por linha)", ["Nome completo","Ordem","Rede","Perfil","Tipo","Link","UF","Cidade"], linSoc,
+      [34,8,16,30,16,46,6,22], "OutrasRedes", {formatos:{"Ordem":"0"}, links:{"Link":l=>l.Link, "Perfil":l=>l.Link}});
+
+    // Aba 4: Todas as inscrições (cada envio do formulário, com o que mudou)
+    const linIns = [];
+    pessoas.forEach(p=> p._lista.forEach((r,k)=>{
+      const [tel] = xlTelefone(r.phone);
+      linIns.push({"Nome completo":p["Nome completo"], "Inscrição nº":k+1, "Data e hora":xlData(r.created_at),
+        "Tipo": k===0 ? "Primeira inscrição" : "Reinscrição",
+        "O que mudou": k===0 ? "" : ((r.changed_fields||[]).length ? r.changed_fields.map(f=>XL_CAMPOS[f]||f).join(", ") : "Mesmos dados da inscrição anterior"),
+        "Nome informado": xlNome(r.full_name), "E-mail": xlLimpar(r.email).toLowerCase(), "Telefone": tel,
+        "Modalidade": modLabel(r), "Registro no Crea": r.no_registry ? "Sem registro" : (r.crea_number||""),
+        "Instagram": xlIgs(r.instagrams).map(i=>i.handle+" ("+i.tipo+")").join("; "),
+        "Outras redes": xlSocs(r.social_profiles).map(s=>s.rede+": "+s.perfil+" ("+s.tipo+")").join("; "),
+        "Cidade/UF": xlNome(r.city)+"/"+xlLimpar(r.uf).toUpperCase()});
+    }));
+    aba("Todas as inscrições","Todas as inscrições (cada envio do formulário)", Object.keys(linIns[0]), linIns,
+      [34,11,17,18,34,34,34,17,30,14,34,44,26], "Inscricoes",
+      {formatos:{"Inscrição nº":"0","Data e hora":"dd/mm/yyyy hh:mm"}, quebra:["O que mudou","Instagram","Outras redes"]});
+
+    // Aba 5: Resumo
+    const ws5 = wb.addWorksheet("Resumo");
+    ws5.getCell("A1").value = "Resumo do cadastro";
+    ws5.getCell("A1").font = {name:"Calibri", size:16, bold:true, color:{argb:AZUL}};
+    ws5.getCell("A2").value = "Extraído em "+gerado+". Contagem por pessoa (reinscrições não contam como pessoa nova).";
+    ws5.getCell("A2").font = {name:"Calibri", size:10, italic:true, color:{argb:"FF595959"}};
+    const conta = arr => { const m = new Map(); arr.forEach(k=> m.set(k, (m.get(k)||0)+1)); return [...m.entries()].sort((a,b)=> b[1]-a[1] || String(a[0]).localeCompare(String(b[0]),"pt-BR")); };
+    const tiposIg = conta(pessoas.flatMap(p=> p._igs.map(i=>i.tipo)));
+    const ind = [
+      ["Influenciadores cadastrados (pessoas)", pessoas.length],
+      ["Inscrições recebidas (com reinscrições)", inf.length],
+      ["Influenciadores que se inscreveram mais de uma vez", pessoas.filter(p=>p._lista.length>1).length],
+      ["Perfis de Instagram informados", linIg.length],
+      ["Influenciadores com mais de um Instagram", pessoas.filter(p=>p._igs.length>1).length],
+      ["Perfis em outras redes informados", linSoc.length],
+      ["Influenciadores com pelo menos uma outra rede", pessoas.filter(p=>p._socs.length>0).length],
+      ["Estados representados", new Set(pessoas.map(p=>p.UF)).size],
+      ["Cidades representadas", new Set(pessoas.map(p=>p.UF+"|"+p.Cidade)).size]
+    ].concat(tiposIg.map(([t,q])=> ['Perfis de Instagram do tipo "'+t+'"', q]));
+    let li = 4;
+    ind.forEach(([k,v])=>{
+      ws5.getCell(li,1).value = k; ws5.getCell(li,1).border = BORDA;
+      const c = ws5.getCell(li,2); c.value = v; c.border = BORDA; c.font = {bold:true}; c.alignment = {horizontal:"center"};
+      li++;
+    });
+    const datas = pessoas.map(p=>p["Primeira inscrição"]).filter(Boolean).sort((a,b)=>a-b);
+    const ultimas = inf.map(r=>xlData(r.created_at)).filter(Boolean).sort((a,b)=>a-b);
+    [["Primeiro cadastro", datas[0]], ["Inscrição mais recente", ultimas[ultimas.length-1]]].forEach(([k,v])=>{
+      ws5.getCell(li,1).value = k; ws5.getCell(li,1).border = BORDA;
+      const c = ws5.getCell(li,2); c.value = v; c.numFmt = "dd/mm/yyyy"; c.border = BORDA; c.font = {bold:true}; c.alignment = {horizontal:"center"};
+      li++;
+    });
+    function bloco(lin, col, titulo, pares, rotulo){
+      ws5.getCell(lin-1, col).value = titulo;
+      ws5.getCell(lin-1, col).font = {bold:true, size:12, color:{argb:AZUL}};
+      [rotulo, "Pessoas", "% das pessoas"].forEach((t,i)=>{
+        const c = ws5.getCell(lin, col+i); c.value = t;
+        c.fill = {type:"pattern", pattern:"solid", fgColor:{argb:AZUL}}; c.font = {bold:true, color:{argb:"FFFFFFFF"}};
+        c.border = BORDA; c.alignment = {horizontal:"center"};
+      });
+      const total = pares.reduce((s,[,q])=>s+q, 0);
+      pares.forEach(([k,q],j)=>{
+        const r = lin+1+j;
+        ws5.getCell(r,col).value = k || "Não informado"; ws5.getCell(r,col).border = BORDA;
+        const a = ws5.getCell(r,col+1); a.value = q; a.border = BORDA; a.alignment = {horizontal:"center"};
+        const p = ws5.getCell(r,col+2); p.value = total ? q/total : 0; p.numFmt = "0.0%"; p.border = BORDA; p.alignment = {horizontal:"center"};
+      });
+      const r = lin+1+pares.length;
+      ws5.getCell(r,col).value = "Total"; ws5.getCell(r,col).font = {bold:true};
+      ws5.getCell(r,col+1).value = total; ws5.getCell(r,col+1).font = {bold:true}; ws5.getCell(r,col+1).alignment = {horizontal:"center"};
+      for(let c=col; c<col+3; c++) ws5.getCell(r,c).border = BORDA;
+      return r;
+    }
+    let fim = bloco(li+2, 1, "Por estado", conta(pessoas.map(p=>p.UF)), "UF");
+    bloco(fim+3, 1, "Por grupo de modalidade", conta(pessoas.map(p=>p["Grupo da modalidade"])), "Grupo");
+    bloco(5, 5, "Por cidade", conta(pessoas.map(p=>p.Cidade+"/"+p.UF)), "Cidade/UF");
+    [48,13,13,4,30,13,13].forEach((w,i)=> ws5.getColumn(i+1).width = w);
+
+    // Aba 6: Histórico de alterações
+    const ACOES = {create:"Cadastro", update:"Alteração", delete:"Exclusão", resubmit:"Reinscrição", key_reset:"Nova chave de acesso"};
+    const AUTORES = {admin:"Administração", influencer:"O próprio influenciador"};
+    const vivos = new Set(inf.map(r=>r.id));
+    const linLog = logs.map(l=>({
+      "Data e hora": xlData(l.created_at),
+      "Influenciador": nomePorId.get(l.influencer_id) || xlNome(l.influencer_name),
+      "Ainda cadastrado?": vivos.has(l.influencer_id) ? "Sim" : "Não (excluído)",
+      "Ação": ACOES[l.action] || xlLimpar(l.action),
+      "Feito por": AUTORES[l.actor_type] || xlLimpar(l.actor_type),
+      "Responsável": xlLimpar(l.actor_label),
+      "Campo": xlLimpar(l.field_label || l.field),
+      "Valor anterior": xlLimpar(l.old_value),
+      "Valor novo": xlLimpar(l.new_value),
+      "Descrição": xlLimpar(l.description)
+    })).sort((a,b)=> (b["Data e hora"]||0) - (a["Data e hora"]||0));
+    aba("Histórico de alterações","Histórico de alterações",
+      ["Data e hora","Influenciador","Ainda cadastrado?","Ação","Feito por","Responsável","Campo","Valor anterior","Valor novo","Descrição"],
+      linLog, [17,34,15,14,22,24,16,22,22,50], "Historico",
+      {formatos:{"Data e hora":"dd/mm/yyyy hh:mm"}, quebra:["Descrição","Valor anterior","Valor novo"]});
+
+    // 5. conferência antes de entregar: totais têm de fechar
+    const somaInsc = pessoas.reduce((s,p)=>s+p._lista.length, 0);
+    if(somaInsc !== inf.length || linIns.length !== inf.length){
+      toast("Os totais não fecharam ("+somaInsc+" de "+inf.length+" inscrições). Exportação cancelada.","err"); return;
+    }
+
+    const buf = await wb.xlsx.writeBuffer();
+    const blob = new Blob([buf], {type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+    const p2 = n => String(n).padStart(2,"0");
+    const nome = "Influenciadores_Cadastrados_"+agora.getFullYear()+"-"+p2(agora.getMonth()+1)+"-"+p2(agora.getDate())+"_"+p2(agora.getHours())+"h"+p2(agora.getMinutes())+".xlsx";
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = nome;
+    document.body.append(a); a.click(); a.remove();
+    setTimeout(()=> URL.revokeObjectURL(a.href), 4000);
+    toast("Excel gerado: "+pessoas.length+" influenciadores, "+inf.length+" inscrições.","ok");
+  }catch(e){
+    toast("Não deu para gerar o Excel: "+(e && e.message ? e.message : e),"err");
+  }finally{
+    btn.disabled = false; btn.textContent = old;
+  }
+}
+
 function renderStats(){
   // contagem por pessoa: reinscrições não somam influenciador novo
   const all = admin.roots || [];
@@ -2199,7 +2616,7 @@ function renderChart(){
 const COLUMNS = [
   {key:"full_name", label:"Influenciador", cls:"c-person", w:"w-person"},
   {key:"email", label:"Contato", cls:"c-contact", w:"w-contact"},
-  {key:"__instagram", label:"Instagram", sort:false, cls:"c-ig", w:"w-ig"},
+  {key:"__instagram", label:"Redes sociais", sort:false, cls:"c-ig", w:"w-ig"},
   {key:"city", label:"Local", cls:"c-local", w:"w-local"},
   {key:"created_at", label:"Cadastro", cls:"c-date", w:"w-date"},
   {key:"__actions", label:"Ações", sort:false, cls:"c-actions", w:"w-actions"}
@@ -2215,7 +2632,8 @@ function getFiltered(){
     if(uf && r.uf!==uf) return false;
     if(mod){ if(mod==="__none__"){ if(r.modality_code) return false; } else if(r.modality_group!==mod) return false; }
     if(!term) return true;
-    const igs = (r.instagrams||[]).map(i=>i.handle).join(" ");
+    const igs = (r.instagrams||[]).map(i=>i.handle)
+      .concat((r.social_profiles||[]).map(s=>(s.handle||"")+" "+(s.url||""))).join(" ");
     return (r.full_name||"").toLowerCase().includes(term)
         || fold(modLabel(r)).includes(fold(term))
         || (r.crea_number||"").includes(onlyDigits(term) || "\u0000")
@@ -2272,6 +2690,21 @@ function igLinks(igs, extraClass){
     wrap.append(line);
   });
   return wrap;
+}
+/* Outras redes: "TikTok @usuario Pessoal"; site e outra rede mostram o endereço sem https:// */
+function socLines(list){
+  const frag = document.createDocumentFragment();
+  (list||[]).forEach(s=>{
+    if(!s || !s.url) return;
+    const net = socNet(s.network);
+    const shown = (s.handle && net.url) ? "@"+s.handle : String(s.url).replace(/^https?:\/\/(www\.)?/i,"");
+    const line = h("div",{class:"soc-line"});
+    line.append(h("span",{class:"net", text:net.label}),
+      h("a",{href:s.url, target:"_blank", rel:"noopener noreferrer", title:s.url}, soft(shown)));
+    if(s.label){ const cls = s.label==="Pessoal"?"pessoal":s.label==="Comercial"?"comercial":""; line.append(h("span",{class:"tag "+cls, text:s.label})); }
+    frag.append(line);
+  });
+  return frag;
 }
 
 function rowActions(row){
@@ -2353,6 +2786,11 @@ function infRow(row, o){
   }
   const igA = igLinks(row.instagrams, "ig-in-contact"), igB = igLinks(row.instagrams);
   if(chg.has("instagrams")){ igA.classList.add("chg"); igB.classList.add("chg"); }
+  [igA, igB].forEach(w=>{
+    const f = socLines(row.social_profiles);
+    if(chg.has("social_profiles")) f.querySelectorAll(".soc-line").forEach(l=>l.classList.add("chg"));
+    w.append(f);
+  });
   const addrChanged = ["cep","address","address_number","complement","neighborhood"].filter(k=>chg.has(k));
   const local = h("div",{class:"stack"}, mark("city", h("span",{class:"main", text:row.city||"-"})), mark("uf", h("span",{class:"sub", text:row.uf||""})));
   if(addrChanged.length) local.append(h("span",{class:"sub chg", text:"endereço novo", title:[row.address, row.address_number, row.complement, row.neighborhood, row.cep].filter(Boolean).join(", ")}));
@@ -2362,7 +2800,7 @@ function infRow(row, o){
       h("div",{class:"person"}, avatarEl(firstIg, row.full_name), txt)),
     h("td",{class:"c-contact", "data-label":"Contato"},
       h("div",{class:"stack"}, mark("email", h("span",{class:"main"}, soft(row.email||"-"))), mark("phone", h("span",{class:"sub", text:row.phone||"-"})), igA)),
-    h("td",{class:"c-ig", "data-label":"Instagram"}, igB),
+    h("td",{class:"c-ig", "data-label":"Redes sociais"}, igB),
     h("td",{class:"c-local", "data-label":"Local"}, local),
     h("td",{class:"c-date", "data-label": o.deriv ? "Reinscrição" : "Cadastro"},
       h("div",{class:"stack"}, h("span",{class:"main", text:dt[0]||"-"}), h("span",{class:"sub", text:dt[1]||""}))),
