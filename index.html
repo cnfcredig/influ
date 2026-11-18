@@ -275,6 +275,7 @@
     html[data-skin="encontro"] body.view-public.fit-2 .lockup{--t:min(16.5cqi, 9.2vh)}
     html[data-skin="encontro"] body.view-public.fit-3 .lockup{--t:min(16.5cqi, 8.2vh)}
     html[data-skin="encontro"] body.view-public.fit-3 .evt-cta{padding-top:7px; padding-bottom:7px}
+    html[data-skin="encontro"] .hero-evt{padding-left:14px}   /* o avião de papel não encosta na borda */
   }
   .evt-logos{display:block; width:min(100%, 430px); height:auto; margin-top:clamp(2px,1vh,10px)}
 
@@ -362,6 +363,7 @@
   html[data-skin="encontro"] .steps .bar{height:7px; background:var(--pink-soft)}
   html[data-skin="encontro"] .steps .bar::after{background:var(--pink)}
   html[data-skin="encontro"] .steps .lbl{font-weight:900; text-transform:uppercase; letter-spacing:.04em; font-size:.7rem}
+  @container form (max-width:360px){ html[data-skin="encontro"] .steps .lbl{letter-spacing:0; font-size:.62rem} }
 
   /* A grade se adapta à largura do próprio cartão do formulário */
   .form-root{container-type:inline-size; container-name:form}
@@ -406,6 +408,11 @@
   .mp-opt[aria-selected="true"] .nm{color:var(--accent-strong)}
   .mp-empty{padding:10px; font-size:.84rem; color:var(--muted)}
   .mp-other{margin-top:8px}
+  .mp.up .mp-list{top:auto; bottom:calc(100% + 6px)}
+  /* durante a medição do encaixe, nada muda de tamanho aos poucos */
+  body.fitting .lockup, body.fitting .lockup *, body.fitting .public-wrap{transition:none !important}
+  body.fitting .mp-list{display:none !important}
+  body.fitting #view-public, body.fitting .public-wrap{flex:none !important}   /* lista aberta fica por cima: não conta na altura */
   html[data-skin="encontro"] .mp-list{border:2px solid var(--navy); box-shadow:4px 4px 0 var(--navy)}
   html[data-skin="encontro"] .mp-group{color:var(--pink)}
   html[data-skin="encontro"] .mp-opt.active, html[data-skin="encontro"] .mp-opt:hover{background:var(--pink-tint)}
@@ -419,23 +426,26 @@
 
   /* ===== Linhas de Instagram ===== */
   .ig-list{display:flex; flex-direction:column; gap:8px}
-  .ig-row{display:grid; grid-template-columns:minmax(0,1fr) 140px 44px; gap:8px; align-items:center}
+  .ig-row{display:grid; grid-template-columns:minmax(0,1fr) 124px 44px; gap:8px; align-items:center}
+  /* com um perfil só, o botão de remover não ocupa espaço */
+  .ig-list.solo .ig-row{grid-template-columns:minmax(0,1fr) 124px}
+  .ig-list.solo .ig-row .rm{display:none}
   .ig-row .pfx{position:relative; min-width:0}
   .ig-row .pfx input{padding-left:28px}
   .ig-row .pfx::before{content:"@"; position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--accent); font-weight:700}
-  @media(max-width:520px){ .ig-row{grid-template-columns:minmax(0,1fr) 108px 44px} }
+  @media(max-width:520px){ .ig-row{grid-template-columns:minmax(0,1fr) 108px 44px} .ig-list.solo .ig-row{grid-template-columns:minmax(0,1fr) 108px} }
   .ig-head{display:flex; align-items:flex-end; justify-content:space-between; gap:10px}
   .ig-add{min-height:32px; padding:4px 11px; font-size:.8rem; white-space:nowrap; flex:none}
 
   /* ===== Celular: país + número ===== */
-  .phone-row{display:grid; grid-template-columns:70px minmax(0,1fr); gap:6px}
+  .phone-row{display:grid; grid-template-columns:66px minmax(0,1fr); gap:6px}
   .phone-row .input{padding-left:10px; padding-right:8px}
   .phone-row .phone-country{padding-right:22px; text-overflow:ellipsis}
 
   /* ===== Outras redes sociais (opcionais) ===== */
   .soc-list{display:flex; flex-direction:column; gap:8px}
   .soc-list:empty{display:none}
-  .soc-row{display:grid; grid-template-columns:150px minmax(0,1fr) 140px 44px; gap:8px; align-items:center}
+  .soc-row{display:grid; grid-template-columns:128px minmax(0,1fr) 124px 44px; gap:8px; align-items:center}
   @media(max-width:520px){
     .soc-row{grid-template-columns:minmax(0,1fr) 108px 44px}
     .soc-row .soc-in{grid-column:1 / -1; grid-row:2}
@@ -1091,7 +1101,7 @@ const UFS = ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","P
 const IG_LABELS = ["Pessoal","Comercial","Outro"];
 /* Outras redes (opcionais). Mesma lista da tabela public.social_networks do banco. */
 const SOCIAL_NETWORKS = [
-  {value:"linkedin", label:"LinkedIn",     ph:"usuário ou link do perfil", url:"https://www.linkedin.com/in/"},
+  {value:"linkedin", label:"LinkedIn",     ph:"usuário ou link",          url:"https://www.linkedin.com/in/"},
   {value:"tiktok",   label:"TikTok",       ph:"@usuario",                  url:"https://www.tiktok.com/@"},
   {value:"youtube",  label:"YouTube",      ph:"@canal ou link",            url:"https://www.youtube.com/@"},
   {value:"facebook", label:"Facebook",     ph:"usuário ou link",           url:"https://www.facebook.com/"},
@@ -1204,7 +1214,7 @@ function modalityPicker(px, code, other){
   const wrap = h("div",{class:"mp"});
   const inp = h("input",{class:"input mp-input", id:px+"_modality_in", type:"text", role:"combobox", autocomplete:"off", spellcheck:"false",
     "aria-autocomplete":"list", "aria-expanded":"false", "aria-controls":listId, enterkeyhint:"next",
-    placeholder:"Digite: civil, elétrica, produção...", value: selText()});
+    placeholder:"Digite: civil, elétrica...", value: selText()});
   const tog = h("button",{class:"mp-toggle", type:"button", tabindex:"-1", "aria-label":"Mostrar todas as modalidades",
     html:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>'});
   const list = h("ul",{class:"mp-list", id:listId, role:"listbox", "aria-label":"Modalidades", hidden:true});
@@ -1243,7 +1253,21 @@ function modalityPicker(px, code, other){
   function show(q){
     // no celular, sobe o campo para o topo para a lista caber acima do teclado
     if(!open && isSmallScreen()) setTimeout(()=> wrap.scrollIntoView({block:"start", behavior: reduceMotion.matches ? "auto" : "smooth"}), 60);
-    render(q); list.hidden = false; open = true; wrap.classList.add("open"); inp.setAttribute("aria-expanded","true"); }
+    render(q); list.hidden = false; open = true; wrap.classList.add("open"); inp.setAttribute("aria-expanded","true"); placeList(); }
+  // a lista abre para baixo; sem espaço embaixo, abre para cima. Nunca passa da borda da janela.
+  function placeList(){
+    if(list.hidden) return;
+    const b = inp.getBoundingClientRect(), vh = window.innerHeight;
+    const topLimit = (document.querySelector(".topbar")||{getBoundingClientRect:()=>({bottom:0})}).getBoundingClientRect().bottom + 8;
+    const below = vh - b.bottom - 14, above = b.top - topLimit - 6;
+    const up = below < 180 && above > below;
+    // com a tela reduzida (zoom), a altura em CSS vale menos na tela: converte
+    const k = inp.offsetHeight ? b.height / inp.offsetHeight : 1;
+    wrap.classList.toggle("up", up);
+    list.style.maxHeight = Math.max(90, Math.min(320 * k, up ? above : below)) / k + "px";
+  }
+  window.addEventListener("resize", ()=>{ if(open) placeList(); });
+  window.addEventListener("fitdone", ()=>{ if(open) placeList(); });
   function hide(){ list.hidden = true; open = false; wrap.classList.remove("open"); inp.setAttribute("aria-expanded","false"); inp.removeAttribute("aria-activedescendant"); }
   function choose(m, q){
     sel = m; prev = m; inp.value = selText(); hide();
@@ -1540,7 +1564,8 @@ function confirmSkin(id){
    ============================================================ */
 /* Passo a passo só quando o formulário inteiro não cabe na altura visível da tela */
 let publicWizardApply = null, fitT = null;
-let lastFitW = 0;
+let lastFitW = 0, lastFitH = 0;
+const MAX_IG = 4, MAX_SOC = 6;   // perfis de Instagram e outras redes por pessoa
 function isSmallScreen(){
   // celular em pé (até 760 px de largura) ou celular deitado (tela de toque baixa)
   return window.matchMedia("(max-width: 760px), (pointer: coarse) and (max-height: 520px)").matches;
@@ -1610,8 +1635,8 @@ function renderForm(host, opts){
   const g1 = stepBox(1, "Seus dados");
   F.full_name = h("input",{class:"input", type:"text", value:data.full_name||"", placeholder:"Nome e sobrenome", autocomplete:"name", enterkeyhint:"next"});
   field(g1, "full_name", "Nome completo", F.full_name, {w:"c-4", mid:12});
-  F.email = h("input",{class:"input", type:"email", value:data.email||"", placeholder:"voce@exemplo.com", autocomplete:"email", inputmode:"email", enterkeyhint:"next"});
-  field(g1, "email", "E-mail", F.email, {w:"c-4", mid:6});
+  F.email = h("input",{class:"input", type:"email", value:data.email||"", placeholder:"seu@email.com", autocomplete:"email", inputmode:"email", enterkeyhint:"next"});
+  field(g1, "email", "E-mail", F.email, {w:"c-3", mid:5});
 
   // celular: país pelo nome + número; no Brasil só aceita DDD existente e celular com 9
   const origCountry = PHONE_BY_ISO.has(data.phone_country) ? data.phone_country : "BR";
@@ -1624,7 +1649,7 @@ function renderForm(host, opts){
     F.phone.value = data.phone_e164 ? onlyDigits(data.phone_e164).slice(c.dial.length) : onlyDigits(data.phone);
   }
   const phoneRow = h("div",{class:"phone-row"}, F.phone_country, F.phone);
-  const phoneWrap = field(g1, "phone", "Celular", phoneRow, {w:"c-4", mid:6});
+  const phoneWrap = field(g1, "phone", "Celular", phoneRow, {w:"c-5", mid:7});
   phoneRow.id = px+"_phone_row";
   phoneWrap.querySelector("label").htmlFor = F.phone.id = px+"_phone";
   let phoneCheckMsg = "";
@@ -1715,9 +1740,12 @@ function renderForm(host, opts){
   igWrap.append(igRows);
   g2.append(igWrap);
   let igCount = 0;
+  const room = { ig:true, soc:true };   // o encaixe diz se mais uma linha ainda cabe na tela
   function refreshIgRemovers(){
     const rows = igRows.querySelectorAll(".ig-row");
     rows.forEach(r=>{ const b=r.querySelector(".rm"); if(b) b.style.visibility = rows.length>1 ? "visible":"hidden"; });
+    igRows.classList.toggle("solo", rows.length <= 1);
+    btnAddIg.hidden = rows.length >= MAX_IG || !room.ig;   // limite para o formulário caber na tela
   }
   function addIgRow(handle, label){
     const n = igCount++;
@@ -1728,13 +1756,14 @@ function renderForm(host, opts){
     pfx.append(inp);
     const lbl = selectEl(IG_LABELS, IG_LABELS.includes(label)?label:(label?"Outro":"Pessoal"), {class:"input", id:px+"_igl"+n, "aria-label":"Tipo de perfil"});
     const rm = h("button",{class:"btn ghost icon rm", type:"button", title:"Remover perfil", "aria-label":"Remover perfil", text:"×"});
-    rm.addEventListener("click", ()=>{ row.remove(); refreshIgRemovers(); });
+    rm.addEventListener("click", ()=>{ row.remove(); refreshIgRemovers(); fitCheck(); });
     row.append(pfx, lbl, rm);
     igRows.append(row);
     refreshIgRemovers();
     return inp;
   }
-  btnAddIg.addEventListener("click", ()=> addIgRow("","Comercial").focus());
+  // depois de cada linha nova, o encaixe roda na hora: o botão some se não cabe mais uma
+  btnAddIg.addEventListener("click", ()=>{ if(btnAddIg.hidden) return; const i = addIgRow("","Comercial"); fitCheck(); i.focus(); });
   const initialIg = Array.isArray(data.instagrams) && data.instagrams.length ? data.instagrams : [{handle:"",label:"Pessoal"}];
   initialIg.forEach(ig => addIgRow(ig.handle||"", ig.label||"Pessoal"));
   function collectIg(){
@@ -1766,12 +1795,14 @@ function renderForm(host, opts){
     inp.addEventListener("input", ()=> clearErr(socWrap));
     const lbl = selectEl(IG_LABELS, IG_LABELS.includes(label)?label:(label?"Outro":"Pessoal"), {class:"input", id:px+"_socl"+n, "aria-label":"Tipo de perfil"});
     const rm = h("button",{class:"btn ghost icon rm", type:"button", title:"Remover rede", "aria-label":"Remover rede", text:"×"});
-    rm.addEventListener("click", ()=>{ row.remove(); clearErr(socWrap); });
+    rm.addEventListener("click", ()=>{ row.remove(); clearErr(socWrap); refreshSocAdd(); fitCheck(); });
     row.append(net, inp, lbl, rm);
     socRows.append(row);
+    refreshSocAdd();
     return inp;
   }
-  btnAddSoc.addEventListener("click", ()=> addSocRow("linkedin","","Pessoal").focus());
+  function refreshSocAdd(){ btnAddSoc.hidden = socRows.querySelectorAll(".soc-row").length >= MAX_SOC || !room.soc; }
+  btnAddSoc.addEventListener("click", ()=>{ if(btnAddSoc.hidden) return; const i = addSocRow("linkedin","","Pessoal"); fitCheck(); i.focus(); });
   (Array.isArray(data.social_profiles) ? data.social_profiles : []).forEach(s =>
     // perfil montado a partir do usuário volta como usuário; o que veio como link volta como link
     addSocRow(s.network, (s.handle && socNet(s.network).url && s.url===socNet(s.network).url+s.handle) ? s.handle : (s.url||s.handle||""), s.label||"Pessoal"));
@@ -1904,7 +1935,13 @@ function renderForm(host, opts){
     if(first){
       if(isWizard()) goTo(first.c.s, false);
       if(first.el){ if(first.el._quietFocus) first.el._quietFocus(); else first.el.focus({preventScroll:false}); }
-      toast(first.c.msg, "err");
+      // o aviso flutuante só aparece se a mensagem do campo não estiver à vista (não cobre o formulário à toa)
+      const fw = first.c.wrap || (first.el ? first.el.closest(".field") : null), fmsg = first.c.msg;
+      setTimeout(()=>{
+        const m = fw && fw.querySelector(".err-msg"), b = m && m.getBoundingClientRect();
+        const seen = b && b.height > 0 && b.top >= 0 && b.bottom <= (window.visualViewport ? window.visualViewport.height : window.innerHeight);
+        if(!seen) toast(fmsg, "err");
+      }, 400);
       return false;
     }
     return true;
@@ -1916,11 +1953,19 @@ function renderForm(host, opts){
   function isWizard(){ return !!opts.wizard && wizOn; }
   function fitCheck(){
     if(!opts.wizard || !root.isConnected) return;
-    if(document.body.classList.contains("filling") && wizOn) { paint(false); return; }
     if(byId("view-public").hidden) return;
+    const body = document.body;
+    // teclado do celular aberto encolhe a janela: mede com a altura de antes do teclado
+    const a = document.activeElement, typing = a && /^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName);
+    if(!typing || window.innerWidth !== lastFitW || window.innerHeight >= lastFitH) lastFitH = window.innerHeight;
+    const keepWiz = body.classList.contains("filling") && wizOn;
     lastFitW = window.innerWidth;
-    const prev = wizOn, keep = cur, body = document.body;
-    const over = ()=> document.documentElement.scrollHeight - window.innerHeight;
+    const prev = wizOn, keep = cur;
+    const availH = lastFitH;
+    const wrapEl = root.closest(".public-wrap");
+    // durante a medição o bloco não estica até a janela: a conta mostra a folga (negativa) ou o excesso
+    const over = ()=> wrapEl ? Math.max(wrapEl.getBoundingClientRect().bottom, document.documentElement.scrollWidth > window.innerWidth ? Infinity : 0) - availH
+                             : document.documentElement.scrollHeight - availH;
     // sobra no pior caso: no passo a passo, mede cada etapa e fica com a mais alta
     const worst = ()=>{
       if(!wizOn) return over();
@@ -1928,19 +1973,117 @@ function renderForm(host, opts){
       for(let s = 1; s <= 3; s++){ cur = s; paint(false); m = Math.max(m, over()); }
       cur = keep; return m;
     };
-    root.classList.add("measuring");
-    body.classList.remove("fit-1","fit-2","fit-3");
-    wizOn = false; paint(false);
-    let o = over();
-    // Passo a passo só em celular e telas pequenas; no computador o formulário fica inteiro
-    // (se não couber na altura, compacta e, no limite, a página rola).
-    if(o > 0 && isSmallScreen()){ wizOn = true; o = worst(); }
-    let lvl = 0;
-    while(o > 0 && lvl < 3){ lvl++; body.classList.add("fit-"+lvl); o = worst(); }
+    const wrap = root.closest(".public-wrap");
+    // Encaixe sem rolagem: 1) compacta em níveis; 2) se ainda faltar altura, reduz a tela por igual,
+    // no maior tamanho que cabe (busca binária), sem passar de zMin para o texto continuar legível
+    function settle(zMin){
+      body.classList.remove("fit-1","fit-2","fit-3");
+      if(wrap) wrap.style.zoom = "";
+      let o = worst(), lvl = 0, z = 1;
+      while(o > 0 && lvl < 3){ lvl++; body.classList.add("fit-"+lvl); o = worst(); }
+      if(o > 0 && wrap){
+        // conta direta: a altura muda quase na proporção do zoom; 2 a 4 medições bastam
+        const setZ = v => { wrap.style.zoom = v.toFixed(3); return worst(); };
+        let best = null, zz = 1, oo = o;
+        for(let i = 0; i < 4; i++){
+          const H = wrap.getBoundingClientRect().height;
+          zz = Math.max(zMin, Math.min(1, zz * (H - oo - 3) / H));
+          oo = setZ(zz);
+          if(oo <= 0 && (!best || zz > best.z)) best = {z:zz, o:oo};
+          if(oo <= 0 && oo > -10) break;          // cabe, com menos de 10 px de folga
+          if(oo > 0 && zz <= zMin) break;          // nem no mínimo cabe
+        }
+        if(best){ z = best.z; o = (z === zz) ? oo : setZ(z); }
+        else { z = zz; o = oo; }
+      }
+      zUsed = zMin;
+      return {o, lvl, z};
+    }
+    let zUsed = 1;
+    root.classList.add("measuring"); body.classList.add("fitting");
+    // nada mudou desde o último encaixe (tamanho da janela, linhas, erros, modo): só confere e sai
+    const sigNow = ()=> [window.innerWidth, availH, wizOn, body.classList.contains("filling"),
+      root.querySelectorAll(".ig-row,.soc-row,.err-msg").length, root.querySelector(".mp-other:not([hidden])") ? 1 : 0,
+      document.documentElement.getAttribute("data-skin"), document.fonts ? document.fonts.status : ""].join("|");
+    const sig = sigNow();
+    if(lastFit && lastFit.sig === sig && worst() <= 0){
+      paint(false);
+      requestAnimationFrame(()=>{ root.classList.remove("measuring"); body.classList.remove("fitting"); });
+      window.dispatchEvent(new Event("fitdone"));
+      return;
+    }
+    let r;
+    if(keepWiz){ r = settle(.8); if(r.o > 0) r = settle(.62); }
+    else {
+      body.classList.remove("fit-1","fit-2","fit-3");
+      if(wrap) wrap.style.zoom = "";
+      wizOn = false; paint(false);
+      // Passo a passo no celular quando o formulário inteiro não cabe; no computador o formulário fica inteiro
+      if(over() > 0 && isSmallScreen()) wizOn = true;
+      r = settle(.8);
+      // com mensagens de erro à vista, o formulário inteiro não vira passo a passo de repente
+      if(r.o > 0 && !wizOn && root.querySelector(".err-msg")) r = settle(.7);
+      // no computador, janela muito baixa ou muitos perfis: passo a passo, sem texto miúdo
+      if(r.o > 0 && !wizOn){ wizOn = true; r = settle(.8); }
+      // último recurso (janela minúscula): reduz um pouco mais
+      if(r.o > 0) r = settle(.62);
+    }
+    // "+ Outro perfil" e "+ Adicionar rede": só aparecem se mais uma linha (e uma mensagem de erro) ainda cabe
+    if(r.o <= 0){
+      // uma medição só, no estado mais compacto permitido (nível 3 e 80%): se a linha a mais cabe ali, cabe
+      const fits = (list, make)=>{
+        const ghost = make(); if(!ghost) return false;
+        // mensagem de erro que aparecer depois tem reserva própria (redução até 70% no computador)
+        ghost.style.visibility = "hidden"; list.append(ghost);
+        const ok = worst() <= 0;
+        ghost.remove(); return ok;
+      };
+      const z0 = zUsed, btnsWas = [btnAddIg.hidden, btnAddSoc.hidden];
+      btnAddIg.hidden = false; btnAddSoc.hidden = false;   // o botão ocupa espaço: mede com ele à vista
+      body.classList.add("fit-1","fit-2","fit-3");
+      if(wrap) wrap.style.zoom = Math.min(r.z, .8).toFixed(3);
+      const igN = igRows.querySelectorAll(".ig-row").length, socN = socRows.querySelectorAll(".soc-row").length;
+      room.ig = igN < MAX_IG && fits(igRows, ()=>{ const l = igRows.querySelector(".ig-row"); return l ? l.cloneNode(true) : null; });
+      room.soc = socN < MAX_SOC && fits(socRows, ()=>{
+        const l = socRows.querySelector(".soc-row");
+        if(l) return l.cloneNode(true);
+        addSocRow("linkedin","","Pessoal"); const n = socRows.lastElementChild; n.remove(); return n;
+      });
+      btnAddIg.hidden = btnsWas[0]; btnAddSoc.hidden = btnsWas[1];
+      refreshIgRemovers(); refreshSocAdd();
+      // volta ao encaixe já calculado; só mede de novo se um botão mudou (ele ocupa espaço)
+      body.classList.remove("fit-1","fit-2","fit-3");
+      for(let l = 1; l <= r.lvl; l++) body.classList.add("fit-"+l);
+      if(wrap) wrap.style.zoom = r.z < 1 ? r.z.toFixed(3) : "";
+      if(btnAddIg.hidden !== btnsWas[0] || btnAddSoc.hidden !== btnsWas[1] || worst() > 0) r = settle(z0);
+    }
     if(prev !== wizOn && !wizOn) cur = 1;
     paint(false);
-    root.dataset.fit = "nivel " + lvl + " / sobra " + Math.max(0, o);
-    requestAnimationFrame(()=> root.classList.remove("measuring"));
+    root.dataset.fit = "nivel " + r.lvl + " / zoom " + r.z.toFixed(3) + " / sobra " + Math.max(0, r.o) + (wizOn ? " / passos" : "");
+    fitBaseH = root.offsetHeight;
+    lastFit = r.o <= 0 ? { sig: sigNow() } : null;
+    requestAnimationFrame(()=>{ root.classList.remove("measuring"); body.classList.remove("fitting"); });
+    window.dispatchEvent(new Event("fitdone"));
+    // conferência final: se algo mudou depois da medição e a página passou da janela, encaixa de novo
+    clearTimeout(fitVerifyT);
+    fitVerifyT = setTimeout(()=>{
+      if(!root.isConnected || byId("view-public").hidden) return;
+      if(document.documentElement.scrollHeight - lastFitH > 0 && fitRetry < 2){ fitRetry++; fitCheck(); }
+      else fitRetry = 0;
+    }, 350);
+  }
+  let fitVerifyT = null, fitRetry = 0, lastFit = null;
+  // Novo encaixe quando o formulário muda de altura (erro, perfil a mais, modalidade Outros)
+  let fitBaseH = 0;
+  if(opts.wizard && window.ResizeObserver){
+    const ro = new ResizeObserver(()=>{
+      if(!fitBaseH || document.body.classList.contains("fitting")) return;
+      const passou = document.documentElement.scrollHeight - (lastFitH || window.innerHeight) > 0;
+      if(passou || Math.abs(root.offsetHeight - fitBaseH) > 2) scheduleFit();
+    });
+    ro.observe(root);
+    // o que muda fora do formulário (título do evento, cabeçalho) também pede novo encaixe
+    requestAnimationFrame(()=> [".hero-evt", ".form-col", ".topbar"].forEach(q=>{ const e = document.querySelector(q); if(e) ro.observe(e); }));
   }
   function goTo(n, checkBefore){
     if(!isWizard()) return;
@@ -2013,6 +2156,7 @@ const publicState = { done:false, submitBtn:null };
 byId("formCard").addEventListener("focusin", ()=>{
   if(window.innerWidth < 900 && !document.body.classList.contains("filling")){
     document.body.classList.add("filling");
+    setTimeout(scheduleFit, 450);   // o título encolhe: reencaixa depois da animação
   }
 });
 function renderPublicForm(){
