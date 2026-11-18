@@ -427,6 +427,11 @@
   .ig-head{display:flex; align-items:flex-end; justify-content:space-between; gap:10px}
   .ig-add{min-height:32px; padding:4px 11px; font-size:.8rem; white-space:nowrap; flex:none}
 
+  /* ===== Celular: país + número ===== */
+  .phone-row{display:grid; grid-template-columns:70px minmax(0,1fr); gap:6px}
+  .phone-row .input{padding-left:10px; padding-right:8px}
+  .phone-row .phone-country{padding-right:22px; text-overflow:ellipsis}
+
   /* ===== Outras redes sociais (opcionais) ===== */
   .soc-list{display:flex; flex-direction:column; gap:8px}
   .soc-list:empty{display:none}
@@ -1329,9 +1334,70 @@ function fmtDateTime(iso){
   return p(d.getDate())+"/"+p(d.getMonth()+1)+"/"+d.getFullYear()+" "+p(d.getHours())+":"+p(d.getMinutes());
 }
 function waLink(phone, msg){
-  const d = onlyDigits(phone);
-  const full = d.length===11 ? "55"+d : d;
+  // aceita a linha do cadastro (usa phone_e164) ou só o texto do telefone (cadastros antigos, Brasil)
+  const row = (phone && typeof phone==="object") ? phone : null;
+  const d = row && row.phone_e164 ? onlyDigits(row.phone_e164) : onlyDigits(row ? row.phone : phone);
+  const full = (!row || !row.phone_e164) && d.length===11 ? "55"+d : d;
   return "https://wa.me/"+full+(msg?("?text="+encodeURIComponent(msg)):"");
+}
+
+/* ===== Telefone: país escolhido pelo nome; no Brasil, DDD existente e celular com 9 =====
+   Lista de países e tamanhos do número: libphonenumber-js 1.13.15 (a mesma da tabela public.phone_countries).
+   DDDs: os 67 em uso no Brasil (Anatel; a libphonenumber-js lista os mesmos). */
+const PHONE_COUNTRIES = "AC,247,5,6,Ilha de Ascensão|AD,376,6,9,Andorra|AE,971,5,12,Emirados Árabes Unidos|AF,93,9,9,Afeganistão|AG,1,10,10,Antígua e Barbuda|AI,1,10,10,Anguila|AL,355,6,9,Albânia|AM,374,8,8,Armênia|AO,244,9,9,Angola|AR,54,10,11,Argentina|AS,1,10,10,Samoa Americana|AT,43,4,13,Áustria|AU,61,5,12,Austrália|AW,297,7,7,Aruba|AX,358,5,12,Ilhas Aland|AZ,994,9,9,Azerbaijão|BA,387,8,9,Bósnia e Herzegovina|BB,1,10,10,Barbados|BD,880,6,10,Bangladesh|BE,32,8,9,Bélgica|BF,226,8,8,Burquina Faso|BG,359,6,12,Bulgária|BH,973,8,8,Barein|BI,257,8,8,Burundi|BJ,229,8,10,Benin|BL,590,9,9,São Bartolomeu|BM,1,10,10,Bermudas|BN,673,7,7,Brunei|BO,591,8,9,Bolívia|BQ,599,7,7,Países Baixos Caribenhos|BR,55,8,11,Brasil|BS,1,10,10,Bahamas|BT,975,7,8,Butão|BW,267,7,10,Botsuana|BY,375,6,11,Bielorrússia|BZ,501,7,11,Belize|CA,1,7,10,Canadá|CC,61,6,12,Ilhas Cocos (Keeling)|CD,243,7,10,Congo - Kinshasa|CF,236,8,8,República Centro-Africana|CG,242,9,9,República do Congo|CH,41,9,12,Suíça|CI,225,10,10,Costa do Marfim|CK,682,5,5,Ilhas Cook|CL,56,9,11,Chile|CM,237,8,9,Camarões|CN,86,7,12,China|CO,57,8,11,Colômbia|CR,506,8,10,Costa Rica|CU,53,6,10,Cuba|CV,238,7,7,Cabo Verde|CW,599,7,8,Curaçao|CX,61,6,12,Ilha Christmas|CY,357,8,8,Chipre|CZ,420,9,12,Tchéquia|DE,49,4,15,Alemanha|DJ,253,8,8,Djibuti|DK,45,8,8,Dinamarca|DM,1,10,10,Dominica|DO,1,10,10,República Dominicana|DZ,213,8,9,Argélia|EC,593,8,11,Equador|EE,372,7,10,Estônia|EG,20,8,10,Egito|EH,212,9,9,Saara Ocidental|ER,291,7,7,Eritreia|ES,34,9,9,Espanha|ET,251,9,9,Etiópia|FI,358,5,12,Finlândia|FJ,679,7,11,Fiji|FK,500,5,5,Ilhas Malvinas (Ilhas Falkland)|FM,691,7,7,Micronésia|FO,298,6,6,Ilhas Faroé|FR,33,9,9,França|GA,241,7,8,Gabão|GB,44,7,10,Reino Unido|GD,1,10,10,Granada|GE,995,9,9,Geórgia|GF,594,9,9,Guiana Francesa|GG,44,7,10,Guernsey|GH,233,8,9,Gana|GI,350,8,8,Gibraltar|GL,299,6,6,Groenlândia|GM,220,7,9,Gâmbia|GN,224,8,9,Guiné|GP,590,9,9,Guadalupe|GQ,240,9,9,Guiné Equatorial|GR,30,10,12,Grécia|GT,502,8,11,Guatemala|GU,1,10,10,Guam|GW,245,7,9,Guiné-Bissau|GY,592,7,7,Guiana|HK,852,5,11,Hong Kong|HN,504,8,11,Honduras|HR,385,7,9,Croácia|HT,509,8,8,Haiti|HU,36,8,9,Hungria|ID,62,7,17,Indonésia|IE,353,7,10,Irlanda|IL,972,7,12,Israel|IM,44,10,10,Ilha de Man|IN,91,8,13,Índia|IO,246,7,7,Território Britânico do Oceano Índico|IQ,964,8,10,Iraque|IR,98,4,10,Irã|IS,354,7,9,Islândia|IT,39,6,12,Itália|JE,44,10,10,Jersey|JM,1,10,10,Jamaica|JO,962,8,9,Jordânia|JP,81,8,17,Japão|KE,254,7,10,Quênia|KG,996,9,10,Quirguistão|KH,855,8,10,Camboja|KI,686,5,8,Quiribati|KM,269,7,7,Comores|KN,1,10,10,São Cristóvão e Névis|KP,850,8,10,Coreia do Norte|KR,82,5,14,Coreia do Sul|KW,965,7,8,Kuwait|KY,1,10,10,Ilhas Cayman|KZ,7,10,14,Cazaquistão|LA,856,8,10,Laos|LB,961,7,8,Líbano|LC,1,10,10,Santa Lúcia|LI,423,7,9,Liechtenstein|LK,94,9,9,Sri Lanka|LR,231,7,9,Libéria|LS,266,8,8,Lesoto|LT,370,8,8,Lituânia|LU,352,4,11,Luxemburgo|LV,371,8,8,Letônia|LY,218,9,9,Líbia|MA,212,9,9,Marrocos|MC,377,8,9,Mônaco|MD,373,8,8,Moldávia|ME,382,8,9,Montenegro|MF,590,9,9,São Martinho|MG,261,9,9,Madagascar|MH,692,7,7,Ilhas Marshall|MK,389,8,8,Macedônia do Norte|ML,223,8,8,Mali|MM,95,6,10,Mianmar (Birmânia)|MN,976,8,10,Mongólia|MO,853,7,8,Macau|MP,1,10,10,Ilhas Marianas do Norte|MQ,596,9,9,Martinica|MR,222,8,8,Mauritânia|MS,1,10,10,Montserrat|MT,356,8,8,Malta|MU,230,7,10,Maurício|MV,960,7,10,Maldivas|MW,265,7,9,Malaui|MX,52,10,10,México|MY,60,8,10,Malásia|MZ,258,8,9,Moçambique|NA,264,8,9,Namíbia|NC,687,6,6,Nova Caledônia|NE,227,8,8,Níger|NF,672,6,6,Ilha Norfolk|NG,234,10,14,Nigéria|NI,505,8,8,Nicarágua|NL,31,5,11,Países Baixos|NO,47,5,8,Noruega|NP,977,8,11,Nepal|NR,674,7,7,Nauru|NU,683,4,7,Niue|NZ,64,5,10,Nova Zelândia|OM,968,7,9,Omã|PA,507,7,11,Panamá|PE,51,8,9,Peru|PF,689,6,9,Polinésia Francesa|PG,675,7,8,Papua-Nova Guiné|PH,63,6,13,Filipinas|PK,92,8,12,Paquistão|PL,48,6,10,Polônia|PM,508,6,9,São Pedro e Miquelão|PR,1,10,10,Porto Rico|PS,970,8,10,Palestina|PT,351,9,9,Portugal|PW,680,7,7,Palau|PY,595,6,11,Paraguai|QA,974,7,11,Catar|RE,262,9,9,Reunião|RO,40,6,9,Romênia|RS,381,6,12,Sérvia|RU,7,10,14,Rússia|RW,250,8,9,Ruanda|SA,966,9,10,Arábia Saudita|SB,677,5,7,Ilhas Salomão|SC,248,7,7,Seicheles|SD,249,9,9,Sudão|SE,46,6,12,Suécia|SG,65,8,11,Singapura|SH,290,4,5,Santa Helena|SI,386,5,8,Eslovênia|SJ,47,5,8,Svalbard e Jan Mayen|SK,421,6,9,Eslováquia|SL,232,8,8,Serra Leoa|SM,378,8,10,San Marino|SN,221,9,9,Senegal|SO,252,6,9,Somália|SR,597,6,7,Suriname|SS,211,9,9,Sudão do Sul|ST,239,7,7,São Tomé e Príncipe|SV,503,7,11,El Salvador|SX,1,10,10,Sint Maarten|SY,963,8,9,Síria|SZ,268,8,9,Essuatíni|TA,290,4,4,Tristão da Cunha|TC,1,10,10,Ilhas Turcas e Caicos|TD,235,8,8,Chade|TG,228,8,8,Togo|TH,66,8,13,Tailândia|TJ,992,9,9,Tadjiquistão|TK,690,4,7,Tokelau|TL,670,7,8,Timor-Leste|TM,993,8,8,Turcomenistão|TN,216,8,8,Tunísia|TO,676,5,7,Tonga|TR,90,7,13,Turquia|TT,1,10,10,Trinidad e Tobago|TV,688,5,7,Tuvalu|TW,886,7,11,Taiwan|TZ,255,9,9,Tanzânia|UA,380,9,10,Ucrânia|UG,256,9,9,Uganda|US,1,10,10,Estados Unidos|UY,598,4,13,Uruguai|UZ,998,9,9,Uzbequistão|VA,39,6,12,Cidade do Vaticano|VC,1,10,10,São Vicente e Granadinas|VE,58,10,10,Venezuela|VG,1,10,10,Ilhas Virgens Britânicas|VI,1,10,10,Ilhas Virgens Americanas|VN,84,7,10,Vietnã|VU,678,5,7,Vanuatu|WF,681,6,9,Wallis e Futuna|WS,685,5,10,Samoa|XK,383,8,12,Kosovo|YE,967,7,9,Iêmen|YT,262,9,9,Mayotte|ZA,27,5,10,África do Sul|ZM,260,9,9,Zâmbia|ZW,263,7,10,Zimbábue".split("|").map(s=>{
+  const p = s.split(","); return {iso:p[0], dial:p[1], min:+p[2], max:+p[3], name:p.slice(4).join(",")};
+});
+try{ const dn = new Intl.DisplayNames(["pt-BR"],{type:"region"}); PHONE_COUNTRIES.forEach(c=>{ const n = dn.of(c.iso); if(n && n!==c.iso) c.name = n; }); }catch(e){}
+const PHONE_BY_ISO = new Map(PHONE_COUNTRIES.map(c=>[c.iso, c]));
+const BR_DDDS = new Set(["11","12","13","14","15","16","17","18","19","21","22","24","27","28","31","32","33","34","35","37","38",
+  "41","42","43","44","45","46","47","48","49","51","53","54","55","61","62","63","64","65","66","67","68","69",
+  "71","73","74","75","77","79","81","82","83","84","85","86","87","88","89","91","92","93","94","95","96","97","98","99"]);
+const LPN_SRC = "https://cdn.jsdelivr.net/npm/libphonenumber-js@1.13.15/bundle/libphonenumber-max.js";
+const LPN_SRI = "sha384-KFpFw4Q7EIpeK/WJ3azDRjpDeYmDLF9DdzBb3LMPtHHFi/99I94irctbZUeBVBQv";
+let lpnLoad = null;
+function loadPhoneLib(){
+  if(window.libphonenumber) return Promise.resolve(window.libphonenumber);
+  if(lpnLoad) return lpnLoad;
+  lpnLoad = new Promise((ok, fail)=>{
+    const s = document.createElement("script");
+    s.src = LPN_SRC; s.integrity = LPN_SRI; s.crossOrigin = "anonymous"; s.referrerPolicy = "no-referrer";
+    s.onload = ()=> window.libphonenumber ? ok(window.libphonenumber) : fail(new Error("sem biblioteca"));
+    s.onerror = ()=>{ lpnLoad = null; fail(new Error("sem biblioteca")); };
+    document.head.append(s);
+  });
+  return lpnLoad;
+}
+/* Brasil: devolve {d, msg}. Corta o que não pode existir, para não dar para digitar errado. */
+function brPhoneSanitize(raw){
+  let d = onlyDigits(raw);
+  if(/^\s*\+\s*55/.test(raw||"") || (d.length>11 && d.startsWith("55"))) d = d.slice(2);
+  d = d.replace(/^0+/, "");
+  let msg = "";
+  // "55" seguido de algo que não é 9 é o código do país, não o DDD 55 (celular no DDD 55 começa com 9)
+  if(d.length >= 3 && d.startsWith("55") && d[2] !== "9"){
+    d = d.slice(2).replace(/^0+/, "");
+    msg = "O 55 do Brasil já está escolhido ao lado. Continue pelo DDD.";
+  }
+  d = d.slice(0,11);
+  if(d.length >= 2 && !BR_DDDS.has(d.slice(0,2))){
+    msg = "O DDD "+d.slice(0,2)+" não existe no Brasil. Confira o DDD.";
+    d = d.slice(0,2);
+  } else if(d.length >= 3 && d[2] !== "9"){
+    msg = "Celular no Brasil começa com 9 depois do DDD.";
+    d = d.slice(0,2);
+  }
+  return {d, msg};
+}
+function brPhoneMask(d){
+  if(d.length<=2) return d.length?("("+d):"";
+  if(d.length<=7) return "("+d.slice(0,2)+")"+d.slice(2);
+  return "("+d.slice(0,2)+")"+d.slice(2,7)+"-"+d.slice(7);
+}
+function phoneOptionLabel(c){ return c.name+" (+"+c.dial+")"; }
+function phoneCountryOptions(){
+  const col = new Intl.Collator("pt-BR",{sensitivity:"base"});
+  const rest = PHONE_COUNTRIES.filter(c=>c.iso!=="BR").sort((a,b)=> col.compare(a.name,b.name));
+  return [PHONE_BY_ISO.get("BR")].concat(rest).map(c=>({value:c.iso, label:phoneOptionLabel(c)}));
 }
 function copyText(text){
   if(navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(text).catch(()=>fallbackCopy(text));
@@ -1543,12 +1609,94 @@ function renderForm(host, opts){
   // --- Passo 1: identificação ---
   const g1 = stepBox(1, "Seus dados");
   F.full_name = h("input",{class:"input", type:"text", value:data.full_name||"", placeholder:"Nome e sobrenome", autocomplete:"name", enterkeyhint:"next"});
-  field(g1, "full_name", "Nome completo", F.full_name, {w:"c-5", mid:12});
+  field(g1, "full_name", "Nome completo", F.full_name, {w:"c-4", mid:12});
   F.email = h("input",{class:"input", type:"email", value:data.email||"", placeholder:"voce@exemplo.com", autocomplete:"email", inputmode:"email", enterkeyhint:"next"});
-  field(g1, "email", "E-mail", F.email, {w:"c-4", mid:7});
-  F.phone = h("input",{class:"input", type:"tel", value:data.phone||"", placeholder:"(11)91234-5678", autocomplete:"tel", inputmode:"numeric", enterkeyhint:"next"});
-  F.phone.addEventListener("input", ()=>{ F.phone.value = maskPhone(F.phone.value); });
-  field(g1, "phone", "Celular com DDD", F.phone, {w:"c-3", mid:5});
+  field(g1, "email", "E-mail", F.email, {w:"c-4", mid:6});
+
+  // celular: país pelo nome + número; no Brasil só aceita DDD existente e celular com 9
+  const origCountry = PHONE_BY_ISO.has(data.phone_country) ? data.phone_country : "BR";
+  const origDigits = onlyDigits(data.phone || "");
+  F.phone_country = selectEl(phoneCountryOptions(), origCountry, {class:"input phone-country", id:px+"_phone_country", "aria-label":"País do celular", autocomplete:"tel-country-code"});
+  F.phone = h("input",{class:"input", type:"tel", value:"", autocomplete:"tel-national", inputmode:"numeric", enterkeyhint:"next"});
+  if(origCountry === "BR") F.phone.value = data.phone || "";
+  else {
+    const c = PHONE_BY_ISO.get(origCountry);
+    F.phone.value = data.phone_e164 ? onlyDigits(data.phone_e164).slice(c.dial.length) : onlyDigits(data.phone);
+  }
+  const phoneRow = h("div",{class:"phone-row"}, F.phone_country, F.phone);
+  const phoneWrap = field(g1, "phone", "Celular", phoneRow, {w:"c-4", mid:6});
+  phoneRow.id = px+"_phone_row";
+  phoneWrap.querySelector("label").htmlFor = F.phone.id = px+"_phone";
+  let phoneCheckMsg = "";
+  const phoneLib = { L:null };
+  const isBR = ()=> F.phone_country.value === "BR";
+  const phoneUnchanged = ()=> mode==="admin-edit" && F.phone_country.value===origCountry && onlyDigits(F.phone.value)===origDigits;
+  function phonePlaceholder(){
+    const c = PHONE_BY_ISO.get(F.phone_country.value);
+    F.phone.placeholder = isBR() ? "(11)91234-5678" : "número sem o +"+c.dial;
+  }
+  function onPhoneInput(){
+    if(isBR()){
+      const {d, msg} = brPhoneSanitize(F.phone.value);
+      F.phone.value = brPhoneMask(d);
+      if(msg) setErr(phoneWrap, msg); else clearErr(phoneWrap);
+      return;
+    }
+    const c = PHONE_BY_ISO.get(F.phone_country.value);
+    let d = onlyDigits(F.phone.value);
+    if(/^\s*\+/.test(F.phone.value) && d.startsWith(c.dial)) d = d.slice(c.dial.length);
+    d = d.slice(0, c.max + 1);   // +1: alguns países usam um 0 antes do número
+    F.phone.value = phoneLib.L ? new phoneLib.L.AsYouType(c.iso).input(d) : d;
+    clearErr(phoneWrap);
+  }
+  function phoneCheck(){
+    if(phoneUnchanged()) return "";
+    const c = PHONE_BY_ISO.get(F.phone_country.value);
+    if(!c) return "Escolha o país do celular.";
+    const d = onlyDigits(F.phone.value);
+    if(isBR()){
+      if(d.length >= 2 && !BR_DDDS.has(d.slice(0,2))) return "O DDD "+d.slice(0,2)+" não existe no Brasil. Confira o DDD.";
+      if(d.length >= 3 && d[2] !== "9") return "Celular no Brasil começa com 9 depois do DDD.";
+      if(d.length !== 11) return "Use DDD + 9 dígitos. Exemplo: (11)91234-5678";
+      return "";
+    }
+    if(phoneLib.L){
+      try{ if(phoneLib.L.isValidPhoneNumber(d, c.iso)) return ""; }catch(e){}
+      return "Número inválido para "+c.name+". Confira o número, sem o +"+c.dial+".";
+    }
+    const n = d.replace(/^0/,"").length;
+    if(n < c.min || n > c.max) return "Número inválido para "+c.name+": "+(c.min===c.max ? c.min : c.min+" a "+c.max)+" dígitos, sem o +"+c.dial+".";
+    return "";
+  }
+  function phoneValue(){
+    if(phoneUnchanged()) return data.phone;
+    const c = PHONE_BY_ISO.get(F.phone_country.value);
+    const d = onlyDigits(F.phone.value);
+    if(isBR()) return brPhoneMask(d);
+    if(phoneLib.L){ try{ const p = phoneLib.L.parsePhoneNumber(d, c.iso); if(p) return "+"+c.dial+p.nationalNumber; }catch(e){} }
+    return "+"+c.dial+d.replace(/^0/,"");
+  }
+  function ensurePhoneLib(){
+    if(isBR() || phoneLib.L) return;
+    loadPhoneLib().then(L=>{ phoneLib.L = L; if(!isBR() && F.phone.value) onPhoneInput(); }).catch(()=>{});
+  }
+  // o campo geral apaga o erro a cada tecla; aqui o erro do telefone é decidido por onPhoneInput
+  F.phone.addEventListener("input", e=>{ e.stopPropagation(); onPhoneInput(); });
+  F.phone.addEventListener("blur", ()=>{ if(!onlyDigits(F.phone.value)) return; const m = phoneCheck(); if(m) setErr(phoneWrap, m); });
+  F.phone_country.addEventListener("change", ()=>{
+    F.phone.value = ""; clearErr(phoneWrap); phonePlaceholder(); ensurePhoneLib(); F.phone.focus();
+  });
+  // fechada, a lista mostra só "+55" (cabe no campo); aberta, mostra os nomes para escolher
+  function countryShort(){
+    [...F.phone_country.options].forEach(o=>{ const c = PHONE_BY_ISO.get(o.value); o.text = o.selected ? "+"+c.dial : phoneOptionLabel(c); });
+    const c = PHONE_BY_ISO.get(F.phone_country.value);
+    F.phone_country.title = phoneOptionLabel(c);
+  }
+  function countryFull(){ [...F.phone_country.options].forEach(o=>{ o.text = phoneOptionLabel(PHONE_BY_ISO.get(o.value)); }); }
+  ["focus","mousedown","touchstart","keydown"].forEach(ev=> F.phone_country.addEventListener(ev, countryFull, {passive:true}));
+  ["blur","change"].forEach(ev=> F.phone_country.addEventListener(ev, countryShort));
+  countryShort();
+  phonePlaceholder(); ensurePhoneLib();
 
   // --- Passo 2: formação e Instagram ---
   const g2 = stepBox(2, "Formação e redes sociais");
@@ -1714,7 +1862,7 @@ function renderForm(host, opts){
   const checks = [
     {s:1, el:F.full_name, ok:()=>F.full_name.value.trim().length>=3, msg:"Informe o nome completo."},
     {s:1, el:F.email, ok:()=>/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(F.email.value.trim()), msg:"Confira o e-mail. Exemplo: nome@gmail.com"},
-    {s:1, el:F.phone, ok:()=>onlyDigits(F.phone.value).length===11, msg:"Use DDD + 9 dígitos. Exemplo: (11)91234-5678"},
+    {s:1, el:F.phone, wrap:phoneWrap, ok:()=>{ const m = phoneCheck(); if(m) phoneCheckMsg = m; return !m; }, get msg(){ return phoneCheckMsg; }},
     {s:2, el:mp.input, wrap:modWrap, ok:()=> !!mp.code() || !needForm, msg:"Escolha a modalidade da sua formação (ou Outros)."},
     {s:2, el:mp.other, wrap:modWrap, ok:()=> mp.code()!=="OUTROS" || mp.otherText().length>=2, msg:"Escreva qual é a sua formação."},
     {s:2, el:F.crea_number, wrap:regWrap, ok:()=>{
@@ -1829,7 +1977,8 @@ function renderForm(host, opts){
     const v = {
       full_name: F.full_name.value.trim(),
       email: F.email.value.trim(),
-      phone: F.phone.value.trim(),
+      phone: phoneValue(),
+      phone_country: F.phone_country.value,
       instagrams: collectIg(),
       social_profiles: collectSoc(),
       uf: F.uf.value,
@@ -2238,6 +2387,25 @@ function xlTelefone(v){
   if(d.length===10) return ["("+d.slice(0,2)+") "+d.slice(2,6)+"-"+d.slice(6), d];
   return [xlLimpar(v), d];
 }
+/* Telefone da linha do cadastro: país, texto, link do WhatsApp e aviso quando está fora da regra */
+function xlFone(r){
+  const iso = r.phone_country || "BR", c = PHONE_BY_ISO.get(iso) || PHONE_BY_ISO.get("BR");
+  if(iso !== "BR"){
+    const e = onlyDigits(r.phone_e164 || r.phone);
+    const nac = e.startsWith(c.dial) ? e.slice(c.dial.length) : e;
+    return {pais:c.name, tel:"+"+c.dial+" "+nac, wa: e ? "https://wa.me/"+e : "", obs:""};
+  }
+  // Brasil: 11 dígitos = DDD + celular. O 55 no começo pode ser DDD de verdade (Santa Maria, RS).
+  const dig = onlyDigits(r.phone);
+  if(dig.length !== 11) return {pais:"Brasil", tel: xlLimpar(r.phone), wa:"", obs:"Telefone incompleto ou fora do padrão: conferir o número."};
+  const tel = "("+dig.slice(0,2)+") "+dig.slice(2,7)+"-"+dig.slice(7);
+  let obs = "";
+  if(!BR_DDDS.has(dig.slice(0,2))) obs = "Telefone com DDD que não existe ("+dig.slice(0,2)+").";
+  else if(dig[2] !== "9") obs = dig.startsWith("55")
+    ? "Telefone fora do padrão: parece ter sido digitado com o 55 do país e falta um dígito."
+    : "Celular sem o 9 depois do DDD: conferir o número.";
+  return {pais:"Brasil", tel, wa: obs ? "" : "https://wa.me/55"+dig, obs};
+}
 function xlCep(v){ const d = onlyDigits(v||""); return d.length===8 ? d.slice(0,5)+"-"+d.slice(5) : xlLimpar(v); }
 /* data/hora de Brasília gravada como está (o Excel não guarda fuso) */
 const XL_TZ = new Intl.DateTimeFormat("en-CA",{timeZone:"America/Sao_Paulo", year:"numeric", month:"2-digit", day:"2-digit", hour:"2-digit", minute:"2-digit", second:"2-digit", hourCycle:"h23"});
@@ -2296,22 +2464,23 @@ async function exportExcel(){
     for(const [rootId, lista] of grupos){
       lista.sort((a,b)=> new Date(a.created_at) - new Date(b.created_at));
       const root = byIdAll.get(rootId), r = lista[lista.length-1];
-      const [tel, dig] = xlTelefone(r.phone);
+      const fone = xlFone(r), tel = fone.tel;
       const igs = xlIgs(r.instagrams), socs = xlSocs(r.social_profiles);
       const rua = xlNome(r.address), num = xlLimpar(r.address_number), comp = xlLimpar(r.complement);
       const bairro = xlNome(r.neighborhood), cidade = xlNome(r.city), uf = xlLimpar(r.uf).toUpperCase(), cep = xlCep(r.cep);
       const end = [rua, num, comp].filter(Boolean).join(", ");
       const obs = [];
-      if(!dig) obs.push("Telefone incompleto: digitado com o 55 do país e falta um dígito.");
+      if(fone.obs) obs.push(fone.obs);
       if(!r.modality_code) obs.push("Inscrição feita antes da pergunta de modalidade.");
       if(!r.crea_number && !r.no_registry) obs.push("Inscrição feita antes da pergunta do registro no Crea.");
       pessoas.push({
         _root: root, _ult: r, _lista: lista, _igs: igs, _socs: socs, _obs: obs,
-        _wa: (dig.length===10 || dig.length===11) ? "https://wa.me/55"+dig : "",
+        _wa: fone.wa,
         "Nome completo": xlNome(r.full_name),
         "E-mail": xlLimpar(r.email).toLowerCase(),
         "Telefone": tel,
-        "WhatsApp": (dig.length===10 || dig.length===11) ? "Abrir conversa" : "",
+        "País do telefone": fone.pais,
+        "WhatsApp": fone.wa ? "Abrir conversa" : "",
         "Modalidade": modLabel(r),
         "Grupo da modalidade": r.modality_group ? modGroupLabel(r.modality_group) : "",
         "Registro no Crea": r.no_registry ? "Sem registro" : (r.crea_number || ""),
@@ -2387,12 +2556,12 @@ async function exportExcel(){
     }
 
     // Aba 1: Influenciadores (uma linha por pessoa)
-    const colsInf = ["Nº","Nome completo","E-mail","Telefone","WhatsApp","Modalidade","Grupo da modalidade","Registro no Crea","Categoria",
+    const colsInf = ["Nº","Nome completo","E-mail","País do telefone","Telefone","WhatsApp","Modalidade","Grupo da modalidade","Registro no Crea","Categoria",
       "Inscrições","Qtd. de Instagram","Instagram principal","Tipo do principal","Outros Instagram","Qtd. de outras redes","Outras redes",
       "UF","Cidade","Bairro","Logradouro","Número","Complemento","CEP","Endereço completo","Primeira inscrição","Última inscrição","Última atualização","Observação"];
     pessoas.forEach((p,i)=>{ p["Nº"] = i+1; });
     aba("Influenciadores","Influenciadores cadastrados", colsInf, pessoas,
-      [6,34,34,17,15,30,24,14,20,11,11,26,16,34,11,44,6,22,22,34,9,18,11,60,17,17,17,44], "Influenciadores", {
+      [6,34,34,16,19,15,30,24,14,20,11,11,26,16,34,11,44,6,22,22,34,9,18,11,60,17,17,17,44], "Influenciadores", {
         formatos:{"Nº":"0","Inscrições":"0","Qtd. de Instagram":"0","Qtd. de outras redes":"0",
           "Primeira inscrição":"dd/mm/yyyy hh:mm","Última inscrição":"dd/mm/yyyy hh:mm","Última atualização":"dd/mm/yyyy hh:mm"},
         links:{"E-mail": l=>"mailto:"+l["E-mail"], "WhatsApp": l=>l._wa, "Instagram principal": l=> l._igs[0] && l._igs[0].link},
@@ -2414,7 +2583,7 @@ async function exportExcel(){
     // Aba 4: Todas as inscrições (cada envio do formulário, com o que mudou)
     const linIns = [];
     pessoas.forEach(p=> p._lista.forEach((r,k)=>{
-      const [tel] = xlTelefone(r.phone);
+      const tel = xlFone(r).tel;
       linIns.push({"Nome completo":p["Nome completo"], "Inscrição nº":k+1, "Data e hora":xlData(r.created_at),
         "Tipo": k===0 ? "Primeira inscrição" : "Reinscrição",
         "O que mudou": k===0 ? "" : ((r.changed_fields||[]).length ? r.changed_fields.map(f=>XL_CAMPOS[f]||f).join(", ") : "Mesmos dados da inscrição anterior"),
@@ -2709,7 +2878,7 @@ function socLines(list){
 
 function rowActions(row){
   const wrap = h("div",{class:"row-actions"});
-  const wa = h("a",{class:"btn icon wa", href:waLink(row.phone, WHATSAPP_MSG), target:"_blank", rel:"noopener noreferrer", title:"Enviar WhatsApp", "aria-label":"Enviar WhatsApp para "+row.full_name, html:ICON_WA});
+  const wa = h("a",{class:"btn icon wa", href:waLink(row, WHATSAPP_MSG), target:"_blank", rel:"noopener noreferrer", title:"Enviar WhatsApp", "aria-label":"Enviar WhatsApp para "+row.full_name, html:ICON_WA});
   const edit = h("button",{class:"btn ghost icon", type:"button", title:"Editar", "aria-label":"Editar "+row.full_name, html:ICON_EDIT, onclick:()=>openEditModal(row)});
   const del = h("button",{class:"btn ghost icon del", type:"button", title:"Excluir", "aria-label":"Excluir "+row.full_name, html:ICON_TRASH, onclick:()=>deleteInfluencer(row)});
   wrap.append(wa, edit, del);
